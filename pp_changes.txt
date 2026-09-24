@@ -1,0 +1,167 @@
+# pp_changes.txt - PP overrides applied by apply_pp.py
+# Format:  MOVE_NAME  PP      (anything after # is a comment)
+# To disable a line, put a # in front of it. To change a value, edit the number.
+#
+# Design philosophy (Platinum Kaizo style): moves that let you win by setting up
+# or stalling get very low PP. Healing only happens at the hub, so PP 1 = one use per stage.
+#   1   = the strongest setup / field-control moves
+#   2-3 = strong setup, screens, healing, big utility
+#   5-6 = minor setup, evasion, debuffs
+
+# ---------------- SETUP: strongest (1 PP) ----------------
+MOVE_DRAGON_DANCE       1
+MOVE_NASTY_PLOT         1
+MOVE_AGILITY            1
+MOVE_BELLY_DRUM         1
+MOVE_ACID_ARMOR         1
+MOVE_ROCK_POLISH        1
+MOVE_QUIVER_DANCE       1
+MOVE_SHELL_SMASH        1
+MOVE_SHIFT_GEAR         1
+MOVE_GEOMANCY           1
+MOVE_VICTORY_DANCE      1
+MOVE_NO_RETREAT         1
+MOVE_CLANGOROUS_SOUL    1
+MOVE_FILLET_AWAY        1
+MOVE_CHARGE             1
+MOVE_MEDITATE           1
+
+# ---------------- SETUP: strong (3 PP) ----------------
+MOVE_SWORDS_DANCE       3
+MOVE_CALM_MIND          3
+MOVE_BULK_UP            3
+MOVE_AMNESIA            3
+MOVE_CURSE              3
+MOVE_IRON_DEFENSE       3
+MOVE_COIL               3
+MOVE_COTTON_GUARD       3
+MOVE_AUTOTOMIZE         3
+MOVE_TAIL_GLOW          3
+MOVE_TIDY_UP            3
+MOVE_STUFF_CHEEKS       3
+MOVE_TAKE_HEART         3
+MOVE_SHARPEN            3
+MOVE_HOWL               3
+MOVE_ACUPRESSURE        3
+MOVE_MINIMIZE           3
+
+# ---------------- SETUP: minor (5-10 PP) ----------------
+MOVE_COSMIC_POWER       6
+MOVE_GROWTH             5
+MOVE_HARDEN             5
+MOVE_WITHDRAW           5
+MOVE_BARRIER            5
+MOVE_DEFENSE_CURL       5
+MOVE_DEFEND_ORDER       5
+MOVE_FOCUS_ENERGY       5
+MOVE_WORK_UP            5
+MOVE_HONE_CLAWS         5
+MOVE_STOCKPILE          10
+
+# ---------------- EVASION ----------------
+MOVE_DOUBLE_TEAM        6
+
+# ---------------- STAT-DROP MOVES ----------------
+MOVE_SAND_ATTACK        5
+MOVE_SMOKESCREEN        5
+MOVE_FLASH              5
+MOVE_SWEET_SCENT        2
+MOVE_SCREECH            5
+MOVE_METAL_SOUND        3
+MOVE_FAKE_TEARS         3
+MOVE_CHARM              3
+MOVE_TICKLE             6
+MOVE_CAPTIVATE          3
+MOVE_FEATHER_DANCE      3
+MOVE_TAIL_WHIP          1
+MOVE_LEER               1
+MOVE_GROWL              1
+MOVE_STRING_SHOT        5
+MOVE_COTTON_SPORE       5
+MOVE_KINESIS            5
+MOVE_PLAY_NICE          3
+MOVE_CONFIDE            3
+MOVE_NOBLE_ROAR         3
+MOVE_EERIE_IMPULSE      3
+MOVE_VENOM_DRENCH       3
+MOVE_FORESIGHT          5
+
+# ---------------- STALL / SUSTAIN: healing ----------------
+MOVE_REST               3
+MOVE_SUBSTITUTE         2
+MOVE_SHED_TAIL          2
+MOVE_RECOVER            3
+MOVE_SOFT_BOILED        3
+MOVE_MILK_DRINK         3
+MOVE_SLACK_OFF          3
+MOVE_ROOST              5
+MOVE_SYNTHESIS          3
+MOVE_MOONLIGHT          3
+MOVE_MORNING_SUN        3
+MOVE_WISH               3
+MOVE_SHORE_UP           3
+MOVE_LIFE_DEW           3
+MOVE_JUNGLE_HEALING     3
+MOVE_LUNAR_BLESSING     3
+MOVE_HEALING_WISH       3
+MOVE_LUNAR_DANCE        3
+MOVE_HEAL_PULSE         5
+MOVE_FLORAL_HEALING     5
+MOVE_STRENGTH_SAP       5
+MOVE_PURIFY             5
+MOVE_HEAL_BELL          1
+MOVE_AROMATHERAPY       1
+MOVE_REFRESH            3
+MOVE_INGRAIN            1
+MOVE_AQUA_RING          3
+# Revives a fainted party member - would break permadeath, so 1 PP (or delete it from your movepools)
+MOVE_REVIVAL_BLESSING   1
+
+# ---------------- STALL / SUSTAIN: protection and screens ----------------
+MOVE_PROTECT            5
+MOVE_DETECT             5
+MOVE_ENDURE             5
+MOVE_KINGS_SHIELD       5
+MOVE_SPIKY_SHIELD       5
+MOVE_BANEFUL_BUNKER     5
+MOVE_OBSTRUCT           5
+MOVE_SILK_TRAP          5
+MOVE_BURNING_BULWARK    5
+MOVE_LIGHT_SCREEN       2
+MOVE_REFLECT            2
+MOVE_AURORA_VEIL        2
+MOVE_SAFEGUARD          5
+MOVE_MIST               3
+
+# ---------------- FIELD CONTROL: weather, terrain, rooms ----------------
+MOVE_RAIN_DANCE         1
+MOVE_SUNNY_DAY          1
+MOVE_SANDSTORM          1
+MOVE_HAIL               1
+MOVE_SNOWSCAPE          1
+MOVE_CHILLY_RECEPTION   1
+MOVE_ELECTRIC_TERRAIN   1
+MOVE_GRASSY_TERRAIN     1
+MOVE_MISTY_TERRAIN      1
+MOVE_PSYCHIC_TERRAIN    1
+MOVE_TRICK_ROOM         1
+MOVE_MAGIC_ROOM         1
+MOVE_WONDER_ROOM        1
+MOVE_DEFOG              1
+
+# ---------------- UTILITY ----------------
+MOVE_ENCORE             3
+MOVE_SKILL_SWAP         2
+MOVE_POWER_SWAP         3
+MOVE_GUARD_SWAP         3
+MOVE_PSYCH_UP           3
+MOVE_NATURAL_GIFT       1
+MOVE_TRUMP_CARD         1
+MOVE_BATON_PASS         5
+
+# ---------------- OPTIONAL (commented out, remove the # to enable) ----------------
+# MOVE_TOXIC            5
+# MOVE_LEECH_SEED       5
+# MOVE_THUNDER_WAVE     10
+# MOVE_SPORE            5
+# MOVE_SLEEP_POWDER     5
