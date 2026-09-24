@@ -234,6 +234,8 @@ void NewGameInitData(void)
     ResetItemFlags();
     ResetDexNav();
     ClearFollowerNPCData();
+    FlagSet(FLAG_SYS_B_DASH);
+    FlagSet(FLAG_SYS_POKEDEX_GET);
 }
 
 static void ResetMiniGamesRecords(void)
