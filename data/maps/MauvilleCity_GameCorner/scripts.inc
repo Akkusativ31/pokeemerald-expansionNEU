@@ -776,3 +776,39 @@ MauvilleCity_GameCorner_Text_CantPlayWithNoCoinCase:
 	.string "You can't play if you don't have\n"
 	.string "a COIN CASE.$"
 
+
+MauvilleCity_GameCorner_EventScript_Nurse::
+	lock
+	faceplayer
+	msgbox MauvilleCity_GameCorner_Text_HealPrompt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_NurseDeclined
+	message MauvilleCity_GameCorner_Text_TakeRest
+	waitmessage
+	fadescreen FADE_TO_BLACK
+	playfanfare MUS_HEAL
+	special HealPlayerParty
+        setrespawn HEAL_LOCATION_MAUVILLE_CITY_GAME_CORNER
+	waitfanfare
+	fadescreen FADE_FROM_BLACK
+	msgbox MauvilleCity_GameCorner_Text_PartyHealed, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_NurseDeclined:
+	msgbox MauvilleCity_GameCorner_Text_DeclineHeal, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_Text_HealPrompt:
+	.string "Welcome! Would you like me to heal\n"
+	.string "your Pokémon?$"
+
+MauvilleCity_GameCorner_Text_TakeRest:
+	.string "Okay, rest up for a moment...$"
+
+MauvilleCity_GameCorner_Text_PartyHealed:
+	.string "Your Pokémon are fully restored and\n"
+	.string "ready for battle!$"
+
+MauvilleCity_GameCorner_Text_DeclineHeal:
+	.string "Good luck out there!$"
