@@ -812,3 +812,172 @@ MauvilleCity_GameCorner_Text_PartyHealed:
 
 MauvilleCity_GameCorner_Text_DeclineHeal:
 	.string "Good luck out there!$"
+
+
+MauvilleCity_GameCorner_EventScript_StarterTrashCan::
+	lock
+	goto_if_set FLAG_SYS_POKEMON_GET, MauvilleCity_GameCorner_EventScript_TrashEmpty
+	msgbox MauvilleCity_GameCorner_Text_LookInTrash, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_DeclinedStarter
+	message MauvilleCity_GameCorner_Text_WhichStarter
+	waitmessage
+	dynmultichoice 0, 0, TRUE, 3, 0, 0, MauvilleCity_GameCorner_Text_Turtwig, MauvilleCity_GameCorner_Text_Chimchar, MauvilleCity_GameCorner_Text_Piplup
+	switch VAR_RESULT
+	case 0, MauvilleCity_GameCorner_GiveTurtwig
+	case 1, MauvilleCity_GameCorner_GiveChimchar
+	case 2, MauvilleCity_GameCorner_GivePiplup
+	case MULTI_B_PRESSED, MauvilleCity_GameCorner_EventScript_DeclinedStarter
+	end
+
+MauvilleCity_GameCorner_GiveTurtwig:
+	givemon SPECIES_TURTWIG, 5, ITEM_NONE
+	goto MauvilleCity_GameCorner_FinishStarter
+
+MauvilleCity_GameCorner_GiveChimchar:
+	givemon SPECIES_CHIMCHAR, 5, ITEM_NONE
+	goto MauvilleCity_GameCorner_FinishStarter
+
+MauvilleCity_GameCorner_GivePiplup:
+	givemon SPECIES_PIPLUP, 5, ITEM_NONE
+	goto MauvilleCity_GameCorner_FinishStarter
+
+MauvilleCity_GameCorner_FinishStarter:
+	playfanfare MUS_OBTAIN_ITEM
+	message MauvilleCity_GameCorner_Text_ObtainedStarter
+	waitfanfare
+	setflag FLAG_SYS_POKEMON_GET
+	setflag FLAG_SYS_POKEDEX_GET
+	msgbox MauvilleCity_GameCorner_Text_TakeCare, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_TrashEmpty:
+	msgbox MauvilleCity_GameCorner_Text_TrashIsEmpty, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_DeclinedStarter:
+	msgbox MauvilleCity_GameCorner_Text_LeftTrashAlone, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_Text_LookInTrash:
+	.string "There are three Poké Balls tucked in\n"
+	.string "the trash can! Take one?$"
+
+MauvilleCity_GameCorner_Text_WhichStarter:
+	.string "Which Pokémon will you choose?$"
+
+MauvilleCity_GameCorner_Text_Turtwig:
+	.string "TURTWIG$"
+
+MauvilleCity_GameCorner_Text_Chimchar:
+	.string "CHIMCHAR$"
+
+MauvilleCity_GameCorner_Text_Piplup:
+	.string "PIPLUP$"
+
+MauvilleCity_GameCorner_Text_ObtainedStarter:
+	.string "You retrieved your starting Pokémon!$"
+
+MauvilleCity_GameCorner_Text_TakeCare:
+	.string "Take good care of your new partner!$"
+
+MauvilleCity_GameCorner_Text_TrashIsEmpty:
+	.string "It's just a dirty trash can.$"
+
+MauvilleCity_GameCorner_Text_LeftTrashAlone:
+	.string "Better leave it alone...$"
+
+MauvilleCity_GameCorner_EventScript_SlotMachineWarp::
+	lock
+	msgbox MauvilleCity_GameCorner_Text_SlotPortalPrompt, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_CancelWarp
+	message MauvilleCity_GameCorner_Text_EnteringPortal
+	waitmessage
+	warpsilent MAP_ROUTE_ONE, 1, 6  @ Change (15, 18) to where you want to spawn on RouteOne
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_CancelWarp:
+	release
+	end
+
+MauvilleCity_GameCorner_Text_SlotPortalPrompt:
+	.string "There's a secret mechanism behind\n"
+	.string "this slot machine! Enter Route 1?$"
+
+MauvilleCity_GameCorner_Text_EnteringPortal:
+	.string "Warping to the encounter area...$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot1::
+	lock
+	goto_if_eq VAR_LOOP_STAGE, 0, MauvilleCity_GameCorner_EventScript_WarpEncounter1
+	goto_if_gt VAR_LOOP_STAGE, 0, MauvilleCity_GameCorner_EventScript_Encounter1Used
+	msgbox MauvilleCity_GameCorner_Text_EncounterLocked, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_WarpEncounter1:
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_Cancel
+	setvar VAR_LOOP_STAGE, 1  @ Sperrt Encounter 1 und schaltet Boss 1 frei!
+	warpsilent MAP_ROUTE_ONE, 15, 18
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_Encounter1Used:
+	msgbox MauvilleCity_GameCorner_Text_EncounterAlreadyUsed, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossSlot1::
+	lock
+	goto_if_eq VAR_LOOP_STAGE, 1, MauvilleCity_GameCorner_EventScript_WarpBoss1
+	goto_if_lt VAR_LOOP_STAGE, 1, MauvilleCity_GameCorner_EventScript_MustDoEncounterFirst
+	msgbox MauvilleCity_GameCorner_Text_Boss1AlreadyDefeated, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_WarpBoss1:
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_Cancel
+	warpsilent MAP_BOSS_ONE, 5, 5
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_MustDoEncounterFirst:
+	msgbox MauvilleCity_GameCorner_Text_NeedEncounterFirst, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_Cancel:
+	release
+	end
+
+@ --- Text Definitions ---
+MauvilleCity_GameCorner_Text_ConfirmEncounter:
+	.string "Möchtest du die Encounter-Zone\n"
+	.string "für Stage 1 betreten? (1 Versuch)$"
+
+MauvilleCity_GameCorner_Text_EncounterAlreadyUsed:
+	.string "Du hast deine Begegnung für diese\n"
+	.string "Stage bereits genutzt!$"
+
+MauvilleCity_GameCorner_Text_EncounterLocked:
+	.string "Dieser Automat ist noch gesperrt.$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss:
+	.string "Bist du bereit für den Arena-Boss\n"
+	.string "von Stage 1?$"
+
+MauvilleCity_GameCorner_Text_NeedEncounterFirst:
+	.string "Du musst zuerst deine Encounter-Zone\n"
+	.string "betreten, bevor du zum Boss kannst!$"
+
+MauvilleCity_GameCorner_Text_Boss1AlreadyDefeated:
+	.string "Du hast diesen Boss bereits besiegt.\n"
+	.string "Gehe weiter zur nächsten Stage!$"

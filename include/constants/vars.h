@@ -339,3 +339,5 @@
 #endif // TESTING
 
 #endif // GUARD_CONSTANTS_VARS_H
+
+#define VAR_LOOP_STAGE    0x4050  // Verwendet einen freien Slot im Custom-Variablen-Bereich

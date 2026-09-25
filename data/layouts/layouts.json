@@ -9333,6 +9333,26 @@
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/RouteOne/border.bin",
       "blockdata_filepath": "data/layouts/RouteOne/map.bin"
+    },
+    {
+      "id": "LAYOUT_HUB",
+      "name": "Hub_Layout",
+      "width": 20,
+      "height": 20,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_GameCorner",
+      "border_filepath": "data/layouts/Hub/border.bin",
+      "blockdata_filepath": "data/layouts/Hub/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_ONE",
+      "name": "BossOne_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossOne/border.bin",
+      "blockdata_filepath": "data/layouts/BossOne/map.bin"
     }
   ]
 }
