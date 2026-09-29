@@ -9,15 +9,15 @@ u32 GetCurrentLevelCap(void)
 {
     static const u32 sLevelCapFlagMap[][2] =
     {
-        {FLAG_BADGE01_GET, 15},
-        {FLAG_BADGE02_GET, 19},
-        {FLAG_BADGE03_GET, 24},
-        {FLAG_BADGE04_GET, 29},
-        {FLAG_BADGE05_GET, 31},
-        {FLAG_BADGE06_GET, 33},
-        {FLAG_BADGE07_GET, 42},
-        {FLAG_BADGE08_GET, 46},
-        {FLAG_IS_CHAMPION, 58},
+        // Cap = level of the highest Pokémon of the next boss (first unset flag wins).
+        {FLAG_BADGE01_GET, 16}, // Roxanne
+        {FLAG_BADGE02_GET, 26}, // Brawly
+        {FLAG_BADGE03_GET, 33}, // Wattson
+        {FLAG_BADGE04_GET, 39}, // Flannery
+        {FLAG_BADGE05_GET, 44}, // Norman
+        {FLAG_BADGE06_GET, 53}, // Winona
+        {FLAG_BADGE07_GET, 56}, // Wallace
+        {FLAG_BADGE08_GET, 62}, // Wally
     };
 
     u32 i;

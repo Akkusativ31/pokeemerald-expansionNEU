@@ -923,7 +923,7 @@ MauvilleCity_GameCorner_EventScript_WarpEncounter1:
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_Cancel
 	setvar VAR_LOOP_STAGE, 1  @ Sperrt Encounter 1 und schaltet Boss 1 frei!
-	warpsilent MAP_ROUTE_ONE, 15, 18
+	warpsilent MAP_ROUTE_ONE, 15, 6
 	waitstate
 	release
 	end

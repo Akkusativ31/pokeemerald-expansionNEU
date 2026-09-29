@@ -6551,6 +6551,39 @@ enum Species GetSpeciesPreEvolution(enum Species species)
     return SPECIES_NONE;
 }
 
+// Dupes clause: checks whether any Pokémon in the species' evolution family is registered as caught.
+static bool32 IsEvolutionTreeCaught(enum Species species, u32 depth)
+{
+    u32 i;
+    const struct Evolution *evolutions;
+
+    if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_CAUGHT))
+        return TRUE;
+
+    evolutions = GetSpeciesEvolutions(species);
+    if (evolutions == NULL || depth >= 4)
+        return FALSE;
+
+    for (i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+    {
+        if (IsSpeciesEnabled(evolutions[i].targetSpecies) && IsEvolutionTreeCaught(SanitizeSpeciesId(evolutions[i].targetSpecies), depth + 1))
+            return TRUE;
+    }
+    return FALSE;
+}
+
+bool32 IsSpeciesFamilyCaught(enum Species species)
+{
+    enum Species base = SanitizeSpeciesId(species);
+    enum Species pre;
+    u32 depth = 0;
+
+    while ((pre = GetSpeciesPreEvolution(base)) != SPECIES_NONE && depth++ < 4)
+        base = pre;
+
+    return IsEvolutionTreeCaught(base, 0);
+}
+
 void UpdateDaysPassedSinceFormChange(u16 days)
 {
     u32 i;
