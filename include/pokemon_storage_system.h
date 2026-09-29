@@ -38,6 +38,11 @@ u8 *StringCopyAndFillWithSpaces(u8 *dst, const u8 *src, u16 n);
 void ShowPokemonStorageSystemPC(void);
 void ResetPokemonStorageSystem(void);
 s16 CompactPartySlots(void);
+#define GRAVEYARD_BOX (TOTAL_BOXES_COUNT - 1) // Permadeath: dead Pokémon are moved here and locked in.
+bool32 IsGraveyardBox(u8 boxId);
+void SendDeadMonsToGraveyard(void);
+bool32 HasGraveyardMessagePending(void);
+void PopGraveyardName(void);
 u8 StorageGetCurrentBox(void);
 u32 GetBoxMonDataAt(u8 boxId, u8 boxPosition, s32 request);
 void SetBoxMonDataAt(u8 boxId, u8 boxPosition, s32 request, const void *value);

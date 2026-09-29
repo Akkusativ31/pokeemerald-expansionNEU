@@ -20,6 +20,7 @@ gSpecials::
 	def_special HealPlayerParty
 	def_special ResetRouteEncounters
 	def_special BufferRouteEncounterLimit
+	def_special PopGraveyardName
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1

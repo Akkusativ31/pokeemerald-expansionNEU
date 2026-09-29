@@ -1298,3 +1298,21 @@ Route_Text_EncounterIntro2:
 Route_Text_EncounterIntro3:
 	.string "Remember: the first {STR_VAR_1} encounters\n"
 	.string "are your only chance on this route.$"
+
+
+@ --- Permadeath: shown after a battle for every Pokémon that was sent to the graveyard box ---
+EventScript_GraveyardMessage::
+	lockall
+EventScript_GraveyardMessageLoop:
+	special PopGraveyardName
+	goto_if_eq VAR_RESULT, FALSE, EventScript_GraveyardMessageDone
+	msgbox EventScript_GraveyardMessage_Text, MSGBOX_DEFAULT
+	goto EventScript_GraveyardMessageLoop
+
+EventScript_GraveyardMessageDone:
+	releaseall
+	end
+
+EventScript_GraveyardMessage_Text:
+	.string "{STR_VAR_1} was laid to rest\n"
+	.string "in the GRAVES box.$"

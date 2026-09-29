@@ -29,6 +29,7 @@
 #include "pokemon.h"
 #include "safari_zone.h"
 #include "script.h"
+#include "pokemon_storage_system.h"
 #include "secret_base.h"
 #include "sound.h"
 #include "start_menu.h"
@@ -158,6 +159,8 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
     }
 }
 
+extern const u8 EventScript_GraveyardMessage[];
+
 int ProcessPlayerFieldInput(struct FieldInput *input)
 {
     struct MapPosition position;
@@ -177,6 +180,13 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
 
     if (TryRunOnFrameMapScript() == TRUE)
         return TRUE;
+
+    // Permadeath: tell the player which Pokémon were just laid to rest in the graveyard box.
+    if (HasGraveyardMessagePending())
+    {
+        ScriptContext_SetupScript(EventScript_GraveyardMessage);
+        return TRUE;
+    }
 
     if (input->pressedBButton && TrySetupDiveEmergeScript() == TRUE)
         return TRUE;

@@ -620,6 +620,7 @@ static u8 HandleInput(void);
 static void AddBoxOptionsMenu(void);
 static u8 SetSelectionMenuTexts(void);
 static bool8 SetMenuTexts_Mon(void);
+static bool8 IsGraveyardCursor(void);
 static bool8 SetMenuTexts_Item(void);
 
 // Choose box menu
@@ -1406,6 +1407,9 @@ s16 GetFirstFreeBoxSpot(u8 boxId)
 {
     u16 i;
 
+    if (boxId == GRAVEYARD_BOX)
+        return -1; // locked
+
     for (i = 0; i < IN_BOX_COUNT; i++)
     {
         if (GetBoxMonDataAt(boxId, i, MON_DATA_SPECIES) == SPECIES_NONE)
@@ -1720,6 +1724,89 @@ static s16 UNUSED StorageSystemGetNextMonIndex(struct BoxPokemon *box, s8 startI
     return -1;
 }
 
+// Names of the Pokémon that were just sent to the graveyard, shown in a message once the player can move again.
+static u8 sGraveyardNames[PARTY_SIZE][POKEMON_NAME_LENGTH + 1];
+static u8 sGraveyardNameCount;
+
+bool32 HasGraveyardMessagePending(void)
+{
+    return sGraveyardNameCount != 0;
+}
+
+// Script special: puts the next pending name into STR_VAR_1. VAR_RESULT is TRUE if there was one.
+void PopGraveyardName(void)
+{
+    if (sGraveyardNameCount == 0)
+    {
+        gSpecialVar_Result = FALSE;
+        return;
+    }
+    StringCopy(gStringVar1, sGraveyardNames[--sGraveyardNameCount]);
+    gSpecialVar_Result = TRUE;
+}
+
+bool32 IsGraveyardBox(u8 boxId)
+{
+    return boxId == GRAVEYARD_BOX;
+}
+
+// Permadeath graveyard: moves dead party Pokémon into the last box, which is locked (nothing goes in or out
+// through the PC). If no Pokémon is alive (a whiteout) nothing is moved, so the party is never left empty.
+void SendDeadMonsToGraveyard(void)
+{
+    u32 i;
+    u32 pos;
+    bool32 moved = FALSE;
+
+    if (CountPartyAliveNonEggMonsExcept(PARTY_SIZE) == 0)
+        return;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        struct Pokemon *mon = &gParties[B_TRAINER_PLAYER][i];
+        enum Item item;
+
+        if (!GetMonData(mon, MON_DATA_SANITY_HAS_SPECIES) || GetMonData(mon, MON_DATA_IS_EGG) || !GetMonData(mon, MON_DATA_IS_DEAD))
+            continue;
+
+        // Held items go back to the bag first.
+        item = GetMonData(mon, MON_DATA_HELD_ITEM);
+        if (item != ITEM_NONE)
+        {
+            if (ItemIsMail(item) || !AddBagItem(item, 1))
+                continue;
+            item = ITEM_NONE;
+            SetMonData(mon, MON_DATA_HELD_ITEM, &item);
+        }
+
+        for (pos = 0; pos < IN_BOX_COUNT; pos++)
+        {
+            if (GetBoxMonDataAt(GRAVEYARD_BOX, pos, MON_DATA_SPECIES) == SPECIES_NONE)
+                break;
+        }
+        if (pos == IN_BOX_COUNT)
+            break; // graveyard is full, the rest stay in the party
+
+        if (sGraveyardNameCount < PARTY_SIZE)
+            GetMonNickname(mon, sGraveyardNames[sGraveyardNameCount++]);
+        CopyMon(GetBoxedMonPtr(GRAVEYARD_BOX, pos), &mon->box, sizeof(mon->box));
+        ZeroMonData(mon);
+        moved = TRUE;
+    }
+
+    if (moved)
+    {
+        CompactPartySlots();
+        CalculatePlayerPartyCount();
+    }
+}
+
+// The cursor is on a Pokémon inside the (locked) graveyard box.
+static bool8 IsGraveyardCursor(void)
+{
+    return sCursorArea == CURSOR_AREA_IN_BOX && StorageGetCurrentBox() == GRAVEYARD_BOX;
+}
+
 void ResetPokemonStorageSystem(void)
 {
     u16 boxId, boxPosition;
@@ -1735,6 +1822,8 @@ void ResetPokemonStorageSystem(void)
         u8 *dest = StringCopy(GetBoxNamePtr(boxId), gText_Box);
         ConvertIntToDecimalStringN(dest, boxId + 1, STR_CONV_MODE_LEFT_ALIGN, 2);
     }
+
+    StringCopy(GetBoxNamePtr(GRAVEYARD_BOX), COMPOUND_STRING("GRAVES"));
 
     for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
         SetBoxWallpaper(boxId, boxId % (MAX_DEFAULT_WALLPAPER + 1));
@@ -3096,9 +3185,9 @@ static const u8 sText_LcEvolved[]       = _("{STR_VAR_1} evolved into\n{STR_VAR_
 static const struct WindowTemplate sWindowTemplate_LevelCapMessage =
 {
     .bg = 0,
-    .tilemapLeft = 10,
+    .tilemapLeft = 1,
     .tilemapTop = 15,
-    .width = 19,
+    .width = 28,
     .height = 4,
     .paletteNum = 15,
     .baseBlock = 0x100,
@@ -3113,7 +3202,7 @@ static void PrintLevelCapMessage(const u8 *text)
     }
     StringExpandPlaceholders(sStorage->lcMessageText, text);
     FillWindowPixelBuffer(sStorage->lcWindowId, PIXEL_FILL(1));
-    AddTextPrinterParameterized(sStorage->lcWindowId, FONT_NARROW, sStorage->lcMessageText, 0, 1, TEXT_SKIP_DRAW, NULL);
+    AddTextPrinterParameterized(sStorage->lcWindowId, FONT_NORMAL, sStorage->lcMessageText, 0, 1, TEXT_SKIP_DRAW, NULL);
     DrawTextBorderOuter(sStorage->lcWindowId, 2, 14);
     PutWindowTilemap(sStorage->lcWindowId);
     CopyWindowToVram(sStorage->lcWindowId, COPYWIN_GFX);
@@ -3315,7 +3404,6 @@ static void Task_LevelToCap(u8 taskId)
         GetSetPokedexFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_SET_CAUGHT);
         StringCopy(gStringVar2, GetSpeciesName(targetSpecies));
         sStorage->lcSpeciesChanged = TRUE;
-        PlayFanfare(MUS_EVOLVED);
         PrintLevelCapMessage(sText_LcEvolved);
         sStorage->state = LC_WAIT_EVOLVED;
         break;
@@ -7201,6 +7289,8 @@ static bool8 IsRemovingLastPartyMon(void)
 
 static bool8 CanPlaceMon(void)
 {
+    if (IsGraveyardCursor())
+        return FALSE;
     if (sIsMonBeingMoved)
     {
         if (sCursorArea == CURSOR_AREA_IN_PARTY && GetMonData(&gParties[B_TRAINER_PLAYER][sCursorPosition], MON_DATA_SPECIES) == SPECIES_NONE)
@@ -7215,6 +7305,8 @@ static bool8 CanPlaceMon(void)
 
 static bool8 CanShiftMon(void)
 {
+    if (IsGraveyardCursor())
+        return FALSE;
     if (sIsMonBeingMoved)
     {
         if (sCursorArea == CURSOR_AREA_IN_PARTY && CountPartyAliveNonEggMonsExcept(sCursorPosition) == 0)
@@ -7540,7 +7632,7 @@ static u8 InBoxInput_Normal(void)
 
         if ((JOY_NEW(A_BUTTON)) && SetSelectionMenuTexts())
         {
-            if (!sAutoActionOn)
+            if (!sAutoActionOn || IsGraveyardCursor())
                 return INPUT_IN_MENU;
 
             if (sStorage->boxOption != OPTION_MOVE_MONS || sIsMonBeingMoved == TRUE)
@@ -8074,6 +8166,15 @@ static u8 SetSelectionMenuTexts(void)
 static bool8 SetMenuTexts_Mon(void)
 {
     enum Species species = GetSpeciesAtCursorPosition();
+
+    if (IsGraveyardCursor())
+    {
+        if (species == SPECIES_NONE || sStorage->boxOption == OPTION_SELECT_MON)
+            return FALSE;
+        SetMenuText(MENU_SUMMARY);
+        SetMenuText(MENU_CANCEL);
+        return TRUE;
+    }
 
     switch (sStorage->boxOption)
     {

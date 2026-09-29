@@ -683,6 +683,7 @@ static void DowngradeBadPoison(void)
 {
     u8 i;
     u32 status = STATUS1_POISON;
+    SendDeadMonsToGraveyard(); // called at the end of every battle that isn't a whiteout
     if (B_TOXIC_REVERSAL < GEN_5)
         return;
     for (i = 0; i < PARTY_SIZE; i++)
