@@ -12,6 +12,7 @@ BossSeven_EventScript_Defeated::
 	waitmessage
 	call Common_EventScript_PlayGymBadgeFanfare
 	setflag FLAG_BADGE07_GET
+	msgbox BossSeven_Text_LevelCap, MSGBOX_DEFAULT
 	msgbox BossSeven_Text_PostBattle, MSGBOX_DEFAULT
 	closemessage
 	warpsilent MAP_MAUVILLE_CITY_GAME_CORNER, 11, 6
@@ -33,3 +34,6 @@ BossSeven_Text_ReceivedBadge:
 BossSeven_Text_PostBattle:
 	.string "You have mastered stage 7!\n"
 	.string "Teleporting you back to the hub...$"
+
+BossSeven_Text_LevelCap:
+	.string "The level cap is now 62!$"

@@ -12,6 +12,7 @@ BossFour_EventScript_Defeated::
 	waitmessage
 	call Common_EventScript_PlayGymBadgeFanfare
 	setflag FLAG_BADGE04_GET
+	msgbox BossFour_Text_LevelCap, MSGBOX_DEFAULT
 	msgbox BossFour_Text_PostBattle, MSGBOX_DEFAULT
 	closemessage
 	warpsilent MAP_MAUVILLE_CITY_GAME_CORNER, 11, 6
@@ -33,3 +34,6 @@ BossFour_Text_ReceivedBadge:
 BossFour_Text_PostBattle:
 	.string "You have mastered stage 4!\n"
 	.string "Teleporting you back to the hub...$"
+
+BossFour_Text_LevelCap:
+	.string "The level cap is now 44!$"

@@ -12,6 +12,7 @@ BossThree_EventScript_Defeated::
 	waitmessage
 	call Common_EventScript_PlayGymBadgeFanfare
 	setflag FLAG_BADGE03_GET
+	msgbox BossThree_Text_LevelCap, MSGBOX_DEFAULT
 	msgbox BossThree_Text_PostBattle, MSGBOX_DEFAULT
 	closemessage
 	warpsilent MAP_MAUVILLE_CITY_GAME_CORNER, 11, 6
@@ -33,3 +34,6 @@ BossThree_Text_ReceivedBadge:
 BossThree_Text_PostBattle:
 	.string "You have mastered stage 3!\n"
 	.string "Teleporting you back to the hub...$"
+
+BossThree_Text_LevelCap:
+	.string "The level cap is now 39!$"

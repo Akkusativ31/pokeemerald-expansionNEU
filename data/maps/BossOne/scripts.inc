@@ -12,6 +12,7 @@ BossOne_EventScript_Defeated::
 	waitmessage
 	call Common_EventScript_PlayGymBadgeFanfare
 	setflag FLAG_BADGE01_GET
+	msgbox BossOne_Text_LevelCap, MSGBOX_DEFAULT
 	msgbox BossOne_Text_PostBattle, MSGBOX_DEFAULT
 	closemessage
 	warpsilent MAP_MAUVILLE_CITY_GAME_CORNER, 11, 6
@@ -33,3 +34,6 @@ BossOne_Text_ReceivedBadge:
 BossOne_Text_PostBattle:
 	.string "You have mastered stage 1!\n"
 	.string "Teleporting you back to the hub...$"
+
+BossOne_Text_LevelCap:
+	.string "The level cap is now 26!$"
