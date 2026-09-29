@@ -889,95 +889,283 @@ MauvilleCity_GameCorner_Text_TrashIsEmpty:
 MauvilleCity_GameCorner_Text_LeftTrashAlone:
 	.string "Better leave it alone...$"
 
-MauvilleCity_GameCorner_EventScript_SlotMachineWarp::
-	lock
-	msgbox MauvilleCity_GameCorner_Text_SlotPortalPrompt, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_CancelWarp
-	message MauvilleCity_GameCorner_Text_EnteringPortal
-	waitmessage
-	warpsilent MAP_ROUTE_ONE, 1, 6  @ Change (15, 18) to where you want to spawn on RouteOne
-	waitstate
-	release
-	end
-
-MauvilleCity_GameCorner_EventScript_CancelWarp:
-	release
-	end
-
-MauvilleCity_GameCorner_Text_SlotPortalPrompt:
-	.string "There's a secret mechanism behind\n"
-	.string "this slot machine! Enter Route 1?$"
-
-MauvilleCity_GameCorner_Text_EnteringPortal:
-	.string "Warping to the encounter area...$"
+@ --- Encounter slots (left machines) and boss slots (right machines) ---
+@ Encounter room N: unlocked by badge N-1, can be entered only once.
+@ Boss room N: unlocked by badge N-1, closed once badge N is earned.
 
 MauvilleCity_GameCorner_EventScript_EncounterSlot1::
 	lock
-	goto_if_eq VAR_LOOP_STAGE, 0, MauvilleCity_GameCorner_EventScript_WarpEncounter1
-	goto_if_gt VAR_LOOP_STAGE, 0, MauvilleCity_GameCorner_EventScript_Encounter1Used
-	msgbox MauvilleCity_GameCorner_Text_EncounterLocked, MSGBOX_DEFAULT
-	release
-	end
-
-MauvilleCity_GameCorner_EventScript_WarpEncounter1:
-	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_Cancel
-	setvar VAR_LOOP_STAGE, 1  @ Sperrt Encounter 1 und schaltet Boss 1 frei!
+	goto_if_set FLAG_ENCOUNTER_1_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter1, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_1_USED
 	warpsilent MAP_ROUTE_ONE, 15, 6
 	waitstate
 	release
 	end
 
-MauvilleCity_GameCorner_EventScript_Encounter1Used:
-	msgbox MauvilleCity_GameCorner_Text_EncounterAlreadyUsed, MSGBOX_DEFAULT
-	release
-	end
-
 MauvilleCity_GameCorner_EventScript_BossSlot1::
 	lock
-	goto_if_eq VAR_LOOP_STAGE, 1, MauvilleCity_GameCorner_EventScript_WarpBoss1
-	goto_if_lt VAR_LOOP_STAGE, 1, MauvilleCity_GameCorner_EventScript_MustDoEncounterFirst
-	msgbox MauvilleCity_GameCorner_Text_Boss1AlreadyDefeated, MSGBOX_DEFAULT
-	release
-	end
-
-MauvilleCity_GameCorner_EventScript_WarpBoss1:
-	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss, MSGBOX_YESNO
-	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_Cancel
+	goto_if_set FLAG_BADGE01_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss1, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	warpsilent MAP_BOSS_ONE, 5, 5
 	waitstate
 	release
 	end
 
-MauvilleCity_GameCorner_EventScript_MustDoEncounterFirst:
-	msgbox MauvilleCity_GameCorner_Text_NeedEncounterFirst, MSGBOX_DEFAULT
+MauvilleCity_GameCorner_Text_ConfirmEncounter1:
+	.string "Enter the encounter zone of\n"
+	.string "stage 1? You can only visit it once!$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss1:
+	.string "Challenge ROXANNE in the\n"
+	.string "stage 1 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot2::
+	lock
+	goto_if_set FLAG_ENCOUNTER_2_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE01_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter2, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_2_USED
+	warpsilent MAP_ROUTE_TWO, 15, 6
+	waitstate
 	release
 	end
 
-MauvilleCity_GameCorner_EventScript_Cancel:
+MauvilleCity_GameCorner_EventScript_BossSlot2::
+	lock
+	goto_if_set FLAG_BADGE02_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE01_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss2, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_TWO, 5, 5
+	waitstate
 	release
 	end
 
-@ --- Text Definitions ---
-MauvilleCity_GameCorner_Text_ConfirmEncounter:
-	.string "Möchtest du die Encounter-Zone\n"
-	.string "für Stage 1 betreten? (1 Versuch)$"
+MauvilleCity_GameCorner_Text_ConfirmEncounter2:
+	.string "Enter the encounter zone of\n"
+	.string "stage 2? You can only visit it once!$"
 
-MauvilleCity_GameCorner_Text_EncounterAlreadyUsed:
-	.string "Du hast deine Begegnung für diese\n"
-	.string "Stage bereits genutzt!$"
+MauvilleCity_GameCorner_Text_ConfirmBoss2:
+	.string "Challenge BRAWLY in the\n"
+	.string "stage 2 boss arena?$"
 
-MauvilleCity_GameCorner_Text_EncounterLocked:
-	.string "Dieser Automat ist noch gesperrt.$"
+MauvilleCity_GameCorner_EventScript_EncounterSlot3::
+	lock
+	goto_if_set FLAG_ENCOUNTER_3_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE02_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter3, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_3_USED
+	warpsilent MAP_ROUTE_THREE, 15, 6
+	waitstate
+	release
+	end
 
-MauvilleCity_GameCorner_Text_ConfirmBoss:
-	.string "Bist du bereit für den Arena-Boss\n"
-	.string "von Stage 1?$"
+MauvilleCity_GameCorner_EventScript_BossSlot3::
+	lock
+	goto_if_set FLAG_BADGE03_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE02_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss3, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_THREE, 5, 5
+	waitstate
+	release
+	end
 
-MauvilleCity_GameCorner_Text_NeedEncounterFirst:
-	.string "Du musst zuerst deine Encounter-Zone\n"
-	.string "betreten, bevor du zum Boss kannst!$"
+MauvilleCity_GameCorner_Text_ConfirmEncounter3:
+	.string "Enter the encounter zone of\n"
+	.string "stage 3? You can only visit it once!$"
 
-MauvilleCity_GameCorner_Text_Boss1AlreadyDefeated:
-	.string "Du hast diesen Boss bereits besiegt.\n"
-	.string "Gehe weiter zur nächsten Stage!$"
+MauvilleCity_GameCorner_Text_ConfirmBoss3:
+	.string "Challenge WATTSON in the\n"
+	.string "stage 3 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot4::
+	lock
+	goto_if_set FLAG_ENCOUNTER_4_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE03_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter4, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_4_USED
+	warpsilent MAP_ROUTE_FOUR, 15, 6
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossSlot4::
+	lock
+	goto_if_set FLAG_BADGE04_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE03_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss4, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_FOUR, 5, 5
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_Text_ConfirmEncounter4:
+	.string "Enter the encounter zone of\n"
+	.string "stage 4? You can only visit it once!$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss4:
+	.string "Challenge FLANNERY in the\n"
+	.string "stage 4 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot5::
+	lock
+	goto_if_set FLAG_ENCOUNTER_5_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE04_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter5, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_5_USED
+	warpsilent MAP_ROUTE_FIVE, 15, 6
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossSlot5::
+	lock
+	goto_if_set FLAG_BADGE05_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE04_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss5, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_FIVE, 5, 5
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_Text_ConfirmEncounter5:
+	.string "Enter the encounter zone of\n"
+	.string "stage 5? You can only visit it once!$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss5:
+	.string "Challenge NORMAN in the\n"
+	.string "stage 5 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot6::
+	lock
+	goto_if_set FLAG_ENCOUNTER_6_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE05_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter6, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_6_USED
+	warpsilent MAP_ROUTE_SIX, 15, 6
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossSlot6::
+	lock
+	goto_if_set FLAG_BADGE06_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE05_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss6, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_SIX, 5, 5
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_Text_ConfirmEncounter6:
+	.string "Enter the encounter zone of\n"
+	.string "stage 6? You can only visit it once!$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss6:
+	.string "Challenge WINONA in the\n"
+	.string "stage 6 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot7::
+	lock
+	goto_if_set FLAG_ENCOUNTER_7_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE06_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter7, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_7_USED
+	warpsilent MAP_ROUTE_SEVEN, 15, 6
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossSlot7::
+	lock
+	goto_if_set FLAG_BADGE07_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE06_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss7, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_SEVEN, 5, 5
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_Text_ConfirmEncounter7:
+	.string "Enter the encounter zone of\n"
+	.string "stage 7? You can only visit it once!$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss7:
+	.string "Challenge WALLACE in the\n"
+	.string "stage 7 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_EncounterSlot8::
+	lock
+	goto_if_set FLAG_ENCOUNTER_8_USED, MauvilleCity_GameCorner_EventScript_EncounterUsed
+	goto_if_unset FLAG_BADGE07_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter8, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	setflag FLAG_ENCOUNTER_8_USED
+	warpsilent MAP_ROUTE_EIGHT, 15, 6
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossSlot8::
+	lock
+	goto_if_set FLAG_BADGE08_GET, MauvilleCity_GameCorner_EventScript_BossDone
+	goto_if_unset FLAG_BADGE07_GET, MauvilleCity_GameCorner_EventScript_SlotLocked
+	msgbox MauvilleCity_GameCorner_Text_ConfirmBoss8, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
+	warpsilent MAP_BOSS_EIGHT, 5, 5
+	waitstate
+	release
+	end
+
+MauvilleCity_GameCorner_Text_ConfirmEncounter8:
+	.string "Enter the encounter zone of\n"
+	.string "stage 8? You can only visit it once!$"
+
+MauvilleCity_GameCorner_Text_ConfirmBoss8:
+	.string "Challenge WALLY in the\n"
+	.string "stage 8 boss arena?$"
+
+MauvilleCity_GameCorner_EventScript_SlotLocked::
+	msgbox MauvilleCity_GameCorner_Text_SlotLocked, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_EncounterUsed::
+	msgbox MauvilleCity_GameCorner_Text_EncounterUsed, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_BossDone::
+	msgbox MauvilleCity_GameCorner_Text_BossDone, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_SlotCancel::
+	release
+	end
+
+MauvilleCity_GameCorner_Text_SlotLocked:
+	.string "This machine is locked.\n"
+	.string "Earn the previous badge first.$"
+
+MauvilleCity_GameCorner_Text_EncounterUsed:
+	.string "You already used this encounter\n"
+	.string "zone.$"
+
+MauvilleCity_GameCorner_Text_BossDone:
+	.string "You already defeated this boss.\n"
+	.string "Move on to the next stage!$"

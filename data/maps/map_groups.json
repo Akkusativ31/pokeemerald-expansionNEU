@@ -1164,9 +1164,23 @@
     "SevenIsland_SevaultCanyon_House_Frlg"
   ],
   "gMapGroup_Routes": [
-    "RouteOne"
+    "RouteOne",
+    "RouteTwo",
+    "RouteThree",
+    "RouteFour",
+    "RouteFive",
+    "RouteSix",
+    "RouteSeven",
+    "RouteEight"
   ],
   "gMapGroup_Bosses": [
-    "BossOne"
+    "BossOne",
+    "BossTwo",
+    "BossThree",
+    "BossFour",
+    "BossFive",
+    "BossSix",
+    "BossSeven",
+    "BossEight"
   ]
 }

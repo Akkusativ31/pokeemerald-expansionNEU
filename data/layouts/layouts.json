@@ -9353,6 +9353,146 @@
       "secondary_tileset": "gTileset_PetalburgGym",
       "border_filepath": "data/layouts/BossOne/border.bin",
       "blockdata_filepath": "data/layouts/BossOne/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_TWO",
+      "name": "RouteTwo_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteTwo/border.bin",
+      "blockdata_filepath": "data/layouts/RouteTwo/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_THREE",
+      "name": "RouteThree_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteThree/border.bin",
+      "blockdata_filepath": "data/layouts/RouteThree/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_FOUR",
+      "name": "RouteFour_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteFour/border.bin",
+      "blockdata_filepath": "data/layouts/RouteFour/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_FIVE",
+      "name": "RouteFive_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteFive/border.bin",
+      "blockdata_filepath": "data/layouts/RouteFive/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_SIX",
+      "name": "RouteSix_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteSix/border.bin",
+      "blockdata_filepath": "data/layouts/RouteSix/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_SEVEN",
+      "name": "RouteSeven_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteSeven/border.bin",
+      "blockdata_filepath": "data/layouts/RouteSeven/map.bin"
+    },
+    {
+      "id": "LAYOUT_ROUTE_EIGHT",
+      "name": "RouteEight_Layout",
+      "width": 20,
+      "height": 14,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Petalburg",
+      "border_filepath": "data/layouts/RouteEight/border.bin",
+      "blockdata_filepath": "data/layouts/RouteEight/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_TWO",
+      "name": "BossTwo_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossTwo/border.bin",
+      "blockdata_filepath": "data/layouts/BossTwo/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_THREE",
+      "name": "BossThree_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossThree/border.bin",
+      "blockdata_filepath": "data/layouts/BossThree/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_FOUR",
+      "name": "BossFour_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossFour/border.bin",
+      "blockdata_filepath": "data/layouts/BossFour/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_FIVE",
+      "name": "BossFive_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossFive/border.bin",
+      "blockdata_filepath": "data/layouts/BossFive/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_SIX",
+      "name": "BossSix_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossSix/border.bin",
+      "blockdata_filepath": "data/layouts/BossSix/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_SEVEN",
+      "name": "BossSeven_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossSeven/border.bin",
+      "blockdata_filepath": "data/layouts/BossSeven/map.bin"
+    },
+    {
+      "id": "LAYOUT_BOSS_EIGHT",
+      "name": "BossEight_Layout",
+      "width": 9,
+      "height": 6,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_PetalburgGym",
+      "border_filepath": "data/layouts/BossEight/border.bin",
+      "blockdata_filepath": "data/layouts/BossEight/map.bin"
     }
   ]
 }
