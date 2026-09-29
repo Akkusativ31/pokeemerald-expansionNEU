@@ -36,6 +36,7 @@
 #include "party_menu.h"
 #include "pokeblock.h"
 #include "pokemon.h"
+#include "wild_encounter.h"
 #include "script.h"
 #include "sound.h"
 #include "strings.h"
@@ -1132,6 +1133,8 @@ static u32 GetBallThrowableState(void)
         return BALL_THROW_UNABLE_DISABLED_FLAG;
     else if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && IsSpeciesFamilyCaught(gBattleMons[GetCatchingBattler()].species))
         return BALL_THROW_UNABLE_DUPLICATE_SPECIES;
+    else if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && IsRouteEncounterCatchBlocked())
+        return BALL_THROW_UNABLE_ROUTE_LIMIT;
 
     return BALL_THROW_ABLE;
 }
@@ -1144,6 +1147,7 @@ bool32 CanThrowBall(void)
 static const u8 sText_CantThrowPokeBall_TwoMons[] = _("Cannot throw a ball!\nThere are two Pokémon out there!\p");
 static const u8 sText_CantThrowPokeBall_SemiInvulnerable[] = _("Cannot throw a ball!\nThere's no Pokémon in sight!\p");
 static const u8 sText_CantThrowPokeBall_Disabled[] = _("POKé BALLS cannot be used\nright now!\p");
+static const u8 sText_CantThrowPokeBall_RouteLimit[] = _("Encounter Clause!\nNo more catches on this route!\p");
 static const u8 sText_CantThrowPokeBall_Duplicate[] = _("Dupes Clause!\nYou already caught this species!\p");
 
 static void ItemUseInBattle_ShowPartyMenu(u8 taskId)
@@ -1261,6 +1265,10 @@ bool32 CannotUseItemsInBattle(enum Item itemId, struct Pokemon *mon)
             break;
         case BALL_THROW_UNABLE_DUPLICATE_SPECIES:
             failStr = sText_CantThrowPokeBall_Duplicate;
+            cannotUse = TRUE;
+            break;
+        case BALL_THROW_UNABLE_ROUTE_LIMIT:
+            failStr = sText_CantThrowPokeBall_RouteLimit;
             cannotUse = TRUE;
             break;
         }

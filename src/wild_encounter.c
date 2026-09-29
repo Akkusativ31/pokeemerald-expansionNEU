@@ -448,6 +448,46 @@ u16 GetCurrentMapWildMonHeaderId(void)
     return HEADER_NONE;
 }
 
+// Encounter clause: only the first B_ROUTE_ENCOUNTER_LIMIT wild encounters on each route can be caught.
+static bool8 sRouteEncounterCatchBlocked;
+
+void RegisterRouteEncounter(void)
+{
+    u16 headerId = GetCurrentMapWildMonHeaderId();
+
+    sRouteEncounterCatchBlocked = FALSE;
+    if (B_ROUTE_ENCOUNTER_LIMIT == 0 || headerId >= ROUTE_ENCOUNTER_SLOTS)
+        return;
+
+    // Dupes clause: a species that can't be caught anyway doesn't use up one of the route's encounters.
+    if (IsSpeciesFamilyCaught(GetMonData(&gParties[B_TRAINER_OPPONENT_A][0], MON_DATA_SPECIES)))
+        return;
+
+    if (gSaveBlock3Ptr->routeEncounters[headerId] < 255)
+        gSaveBlock3Ptr->routeEncounters[headerId]++;
+    if (gSaveBlock3Ptr->routeEncounters[headerId] > B_ROUTE_ENCOUNTER_LIMIT)
+        sRouteEncounterCatchBlocked = TRUE;
+}
+
+bool32 IsRouteEncounterCatchBlocked(void)
+{
+    return sRouteEncounterCatchBlocked;
+}
+
+void ClearRouteEncounterCatchBlock(void)
+{
+    sRouteEncounterCatchBlocked = FALSE;
+}
+
+// Script special: lets the player catch on the current route again (e.g. when a route is re-entered for a new stage).
+void ResetRouteEncounters(void)
+{
+    u16 headerId = GetCurrentMapWildMonHeaderId();
+
+    if (headerId < ROUTE_ENCOUNTER_SLOTS)
+        gSaveBlock3Ptr->routeEncounters[headerId] = 0;
+}
+
 enum TimeOfDay GetTimeOfDayForEncounters(u32 headerId, enum WildPokemonArea area)
 {
     const struct WildPokemonInfo *wildMonInfo;

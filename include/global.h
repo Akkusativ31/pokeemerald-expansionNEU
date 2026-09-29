@@ -254,8 +254,11 @@ struct NPCFollower
 #include "constants/items.h"
 #define ITEM_FLAGS_COUNT ((ITEMS_COUNT / 8) + ((ITEMS_COUNT % 8) ? 1 : 0))
 
+#define ROUTE_ENCOUNTER_SLOTS 448 // must be >= number of wild encounter headers
+
 struct SaveBlock3
 {
+    u8 routeEncounters[ROUTE_ENCOUNTER_SLOTS]; // encounter clause: wild battles started per wild encounter header
 #if OW_USE_FAKE_RTC
     struct SiiRtcInfo fakeRTC;
 #endif

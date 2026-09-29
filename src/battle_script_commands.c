@@ -8063,7 +8063,7 @@ static u32 ComputeCaptureOdds(u32 wildMonBattler, u32 playerBattler)
     struct BallData ball;
     ComputeBallData(wildMonBattler, playerBattler, &ball);
 
-    if (ball.guaranteedCapture)
+    if (ball.guaranteedCapture || B_ALL_BALLS_GUARANTEED_CATCH)
         return CAPTURE_GUARANTEED;
     struct BattlePokemon *battleMon = &gBattleMons[wildMonBattler];
     u32 odds = (battleMon->maxHP * 3 -  battleMon->hp * 2);
