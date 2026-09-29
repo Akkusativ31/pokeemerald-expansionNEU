@@ -1756,3 +1756,4 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/maps/BossSix/scripts.inc"
 	.include "data/maps/BossSeven/scripts.inc"
 	.include "data/maps/BossEight/scripts.inc"
+	.include "data/maps/GameOverRoom/scripts.inc"

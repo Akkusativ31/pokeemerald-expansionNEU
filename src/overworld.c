@@ -1058,6 +1058,9 @@ bool8 MetatileBehavior_IsSurfableInSeafoamIslands(u16 metatileBehavior)
 
 static enum Direction GetAdjustedInitialDirection(struct InitialPlayerAvatarState *playerStruct, u8 transitionFlags, u16 metatileBehavior, enum MapType mapType)
 {
+    // Game over room: the player appears already facing away from the stranger.
+    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(MAP_GAME_OVER_ROOM) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(MAP_GAME_OVER_ROOM))
+        return DIR_NORTH;
     if (FlagGet(FLAG_SYS_CRUISE_MODE) && mapType == MAP_TYPE_OCEAN_ROUTE)
         return DIR_EAST;
     else if (MetatileBehavior_IsDeepSouthWarp(metatileBehavior) == TRUE)
@@ -1967,14 +1970,14 @@ void CB2_WhiteOut(void)
         FieldClearVBlankHBlankCallbacks();
         StopMapMusic();
         ResetSafariZoneFlag_();
-        DoWhiteOut();
+        // Whiteout is a game over: no healing. The player wakes up in a room with a stranger, then the game resets.
+        Overworld_ResetStateAfterWhiteOut();
+        SetWarpDestination(MAP_GROUP(MAP_GAME_OVER_ROOM), MAP_NUM(MAP_GAME_OVER_ROOM), WARP_ID_NONE, 4, 3);
+        WarpIntoMap();
         ResetInitialPlayerAvatarState();
         ScriptContext_Init();
         UnlockPlayerFieldControls();
-        if (IsWhiteoutCutscene())
-            gFieldCallback = FieldCB_RushInjuredPokemonToCenter;
-        else
-            gFieldCallback = FieldCB_WarpExitFadeFromBlack;
+        gFieldCallback = FieldCB_WarpExitFadeFromBlack;
         state = 0;
         SetFollowerNPCData(FNPC_DATA_SURF_BLOB, FNPC_SURF_BLOB_NONE);
         DoMapLoadLoop(&state);

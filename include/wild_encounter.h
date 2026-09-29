@@ -71,6 +71,7 @@ bool8 AreLegendariesInSootopolisPreventingEncounters(void);
 u16 GetCurrentMapWildMonHeaderId(void);
 void RegisterRouteEncounter(void);
 void BufferRouteEncounterLimit(void);
+void GiveRouteEncounterBalls(void);
 bool32 IsRouteEncounterCatchBlocked(void);
 void ClearRouteEncounterCatchBlock(void);
 void ResetRouteEncounters(void);

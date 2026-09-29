@@ -362,9 +362,11 @@ static u32 ChooseWildMonIndex_Fishing(u8 rod)
             wildMonIndex = 8;
         if (rand >= ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_8 && rand < ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_9)
             wildMonIndex = 9;
+        if (rand >= ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_9 && rand < ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_10)
+            wildMonIndex = 10;
 
         if (swap)
-            wildMonIndex = 14 - wildMonIndex;
+            wildMonIndex = 15 - wildMonIndex;
         break;
     }
     return wildMonIndex;
@@ -487,6 +489,12 @@ static u32 GetRouteEncounterLimit(void)
 void BufferRouteEncounterLimit(void)
 {
     ConvertIntToDecimalStringN(gStringVar1, GetRouteEncounterLimit(), STR_CONV_MODE_LEFT_ALIGN, 2);
+}
+
+// Script special: gives one Poké Ball for every catch the current route allows.
+void GiveRouteEncounterBalls(void)
+{
+    gSpecialVar_Result = AddBagItem(ITEM_POKE_BALL, GetRouteEncounterLimit());
 }
 
 void RegisterRouteEncounter(void)

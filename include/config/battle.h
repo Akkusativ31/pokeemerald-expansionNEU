@@ -403,7 +403,7 @@
 #define NUM_BEEPS_GEN_LATEST            4                    // Loops 4 times
 #define NUM_BEEPS_GEN_3                 -1                   // Loops infinitely
 #define NUM_BEEPS_OFF                   0                    // Does not play at all
-#define B_NUM_LOW_HEALTH_BEEPS          NUM_BEEPS_GEN_LATEST // This controls the number of times the "low HP" beep will loop. Setting this value to NUM_BEEPS_OFF will disable the beep, while NUM_BEEPS_GEN_3 will loop infinitely. You can set this to any number you want, the defines listed are just for ease of use.
+#define B_NUM_LOW_HEALTH_BEEPS          3 // This controls the number of times the "low HP" beep will loop. Setting this value to NUM_BEEPS_OFF will disable the beep, while NUM_BEEPS_GEN_3 will loop infinitely. You can set this to any number you want, the defines listed are just for ease of use.
 
 // Animation Settings
 #define B_NEW_SWORD_PARTICLE            FALSE    // If set to TRUE, it updates Swords Dance's particle.
@@ -432,7 +432,7 @@
 #define SHOW_TYPES_ALWAYS   1                    // Always show types in battle.
 #define SHOW_TYPES_CAUGHT   2                    // Only show types if you've caught a Pokémon of that species.
 #define SHOW_TYPES_SEEN     3                    // Only show types if you've seen a Pokémon of that species.
-#define B_SHOW_TYPES        SHOW_TYPES_NEVER     // When to show type indicators next to Pokémon HP bars, while choosing a move after selecting a target Pokémon.
+#define B_SHOW_TYPES        SHOW_TYPES_ALWAYS     // When to show type indicators next to Pokémon HP bars, while choosing a move after selecting a target Pokémon.
 
 #define SHOW_EFFECTIVENESS_NEVER    0           // Never show type effectiveness when selecting moves.
 #define SHOW_EFFECTIVENESS_ALWAYS   1           // Always show type effectiveness when selecting moves.

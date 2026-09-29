@@ -9493,6 +9493,16 @@
       "secondary_tileset": "gTileset_PetalburgGym",
       "border_filepath": "data/layouts/BossEight/border.bin",
       "blockdata_filepath": "data/layouts/BossEight/map.bin"
+    },
+    {
+      "id": "LAYOUT_GAME_OVER_ROOM",
+      "name": "GameOverRoom_Layout",
+      "width": 8,
+      "height": 8,
+      "primary_tileset": "gTileset_Building",
+      "secondary_tileset": "gTileset_BattlePyramid",
+      "border_filepath": "data/layouts/GameOverRoom/border.bin",
+      "blockdata_filepath": "data/layouts/GameOverRoom/map.bin"
     }
   ]
 }

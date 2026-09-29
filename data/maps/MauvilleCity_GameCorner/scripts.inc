@@ -813,6 +813,8 @@ MauvilleCity_GameCorner_EventScript_NurseIntro:
 	msgbox MauvilleCity_GameCorner_Text_NurseHello, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseZones, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseLimit, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseBalls, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseDelay, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseEncounterClause, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseDupesClause, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseBosses, MSGBOX_DEFAULT
@@ -1229,6 +1231,15 @@ MauvilleCity_GameCorner_Text_NurseLimit:
 	.string "On ROUTE ONE that's 5 encounters.\n"
 	.string "Later routes may allow even fewer!$"
 
+MauvilleCity_GameCorner_Text_NurseBalls:
+	.string "Each route hands you one POKé BALL\n"
+	.string "for every catch it allows.$"
+
+MauvilleCity_GameCorner_Text_NurseDelay:
+	.string "You don't have to use every ball.\n"
+	.string "Skip an encounter to delay it,\l"
+	.string "and keep the ball for later.$"
+
 MauvilleCity_GameCorner_Text_NurseEncounterClause:
 	.string "That's the ENCOUNTER CLAUSE. Every\n"
 	.string "wild battle uses up one encounter.\p"
@@ -1282,9 +1293,17 @@ Route_EventScript_EncounterIntro2:
 	goto Route_EventScript_EncounterIntroDone
 
 Route_EventScript_EncounterIntroDone:
+	special GiveRouteEncounterBalls
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox Route_Text_ReceivedBalls, MSGBOX_DEFAULT
+	waitfanfare
 	setvar VAR_TEMP_0, 1
 	releaseall
 	end
+
+Route_Text_ReceivedBalls:
+	.string "You received {STR_VAR_1} POKé BALLS,\n"
+	.string "one for each catch on this route!$"
 
 Route_Text_EncounterIntro1:
 	.string "You have entered an encounter zone.\p"

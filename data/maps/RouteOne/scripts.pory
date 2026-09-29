@@ -34,3 +34,27 @@ RouteOne_Text_Returning:
 RouteOne_Text_DeclinedReturn:
 	.string "Good luck with your catch! Let me\n"
 	.string "know when you are ready to return.$"
+
+RouteOne_EventScript_Fisherman::
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_SUPER_ROD, RouteOne_EventScript_FishermanDone
+	msgbox RouteOne_Text_FishermanGive, MSGBOX_DEFAULT
+	giveitem ITEM_SUPER_ROD
+	setflag FLAG_RECEIVED_SUPER_ROD
+	msgbox RouteOne_Text_FishermanTip, MSGBOX_DEFAULT
+	release
+	end
+
+RouteOne_EventScript_FishermanDone:
+	msgbox RouteOne_Text_FishermanTip, MSGBOX_DEFAULT
+	release
+	end
+
+RouteOne_Text_FishermanGive:
+	.string "Fishing counts as an encounter too.\n"
+	.string "Here, take my SUPER ROD.$"
+
+RouteOne_Text_FishermanTip:
+	.string "The pond shares the route's catch\n"
+	.string "limit with the grass. Choose wisely!$"

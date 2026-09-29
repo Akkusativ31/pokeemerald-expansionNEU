@@ -211,6 +211,7 @@ static bool32 Fishing_InitDots(struct Task *task)
         task->tDotsRequired = randVal + 4;
     if (task->tDotsRequired >= 10)
         task->tDotsRequired = 10;
+    task->tDotsRequired = 3; // guaranteed fishing: always a short, fixed wait
     return TRUE;
 }
 
@@ -271,11 +272,7 @@ static bool32 Fishing_CheckForBite(struct Task *task)
     if (firstMonHasSuctionOrSticky && I_FISHING_STICKY_BOOST < GEN_4)
         bite = RandomPercentage(RNG_FISHING_GEN3_STICKY, FISHING_GEN3_STICKY_CHANCE);
 
-    if (!bite)
-        bite = Fishing_RollForBite(task->tFishingRod, firstMonHasSuctionOrSticky);
-
-    if (!bite)
-        task->tStep = FISHING_NOT_EVEN_NIBBLE;
+    bite = TRUE; // guaranteed fishing: every cast gets a bite
 
     if (bite)
         StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingBiteDirectionAnimNum(GetPlayerFacingDirection()));
@@ -294,18 +291,11 @@ static bool32 Fishing_GotBite(struct Task *task)
 
 static bool32 Fishing_ChangeMinigame(struct Task *task)
 {
-    switch (I_FISHING_MINIGAME)
-    {
-    case GEN_1:
-    case GEN_2:
-        task->tStep = FISHING_A_PRESS_NO_MINIGAME;
-        break;
-    case GEN_3:
-    default:
-        task->tStep = FISHING_WAIT_FOR_A;
-        break;
-    }
-    return TRUE;
+    // Guaranteed fishing: no reel timing. "Oh! A bite!" is shown briefly, then the Pokémon is on the hook.
+    AlignFishingAnimationFrames();
+    if (++task->tFrameCounter >= 30)
+        task->tStep = FISHING_MON_ON_HOOK;
+    return FALSE;
 }
 
 // We have a bite. Now, wait for the player to press A, or the timer to expire.
@@ -471,15 +461,7 @@ static bool32 Fishing_EndNoMon(struct Task *task)
 
 static bool32 DoesFishingMinigameAllowCancel(void)
 {
-    switch (I_FISHING_MINIGAME)
-    {
-    case GEN_1:
-    case GEN_2:
-        return FALSE;
-    case GEN_3:
-    default:
-            return TRUE;
-    }
+    return FALSE; // guaranteed fishing: pressing A can't cancel the cast
 }
 
 static bool32 Fishing_DoesFirstMonInPartyHaveSuctionCupsOrStickyHold(void)
@@ -494,7 +476,7 @@ static bool32 Fishing_DoesFirstMonInPartyHaveSuctionCupsOrStickyHold(void)
     return (ability == ABILITY_SUCTION_CUPS || ability == ABILITY_STICKY_HOLD);
 }
 
-static bool32 Fishing_RollForBite(u32 rod, bool32 isStickyHold)
+static bool32 UNUSED Fishing_RollForBite(u32 rod, bool32 isStickyHold)
 {
     return ((RandomUniform(RNG_FISHING_BITE, 1, 100)) <= CalculateFishingBiteOdds(rod, isStickyHold));
 }
