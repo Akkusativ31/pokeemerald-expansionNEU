@@ -2440,6 +2440,9 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
         case MON_DATA_HP_LOST:
             retVal = boxMon->hpLost;
             break;
+        case MON_DATA_IS_DEAD:
+            retVal = boxMon->isDead;
+            break;
         case MON_DATA_PERSONALITY:
             retVal = boxMon->personality;
             break;
@@ -2542,18 +2545,32 @@ void SetMonData(struct Pokemon *mon, s32 field, const void *dataArg)
     {
         u32 hpLost;
         SET16(mon->hp);
+        if (mon->box.isDead)
+        {
+            // Permadeath: a dead Pokémon can never regain HP.
+            mon->hp = 0;
+        }
+        else if (mon->hp == 0 && mon->maxHP != 0 && mon->box.hasSpecies && !mon->box.isEgg)
+        {
+            mon->box.isDead = TRUE;
+        }
         hpLost = mon->maxHP - mon->hp;
-        SetBoxMonData(&mon->box, MON_DATA_HP_LOST, &hpLost);
+        mon->box.hpLost = hpLost;
         break;
     }
     case MON_DATA_HP_LOST:
     {
         u32 hpLost;
         SET16(hpLost);
+        if (mon->box.isDead)
+            break;
         mon->hp = mon->maxHP - hpLost;
         SetBoxMonData(&mon->box, MON_DATA_HP_LOST, &hpLost);
         break;
     }
+    case MON_DATA_IS_DEAD:
+        SET8(mon->box.isDead);
+        break;
     case MON_DATA_MAX_HP:
         SET16(mon->maxHP);
         break;
@@ -2874,7 +2891,12 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
             break;
         }
         case MON_DATA_HP_LOST:
-            SET16(boxMon->hpLost);
+            // Permadeath: healing (e.g. the Pokémon Center PC heal) can't touch a dead box Pokémon.
+            if (!boxMon->isDead)
+                SET16(boxMon->hpLost);
+            break;
+        case MON_DATA_IS_DEAD:
+            boxMon->isDead = *data;
             break;
         case MON_DATA_PERSONALITY:
             SET32(boxMon->personality);
@@ -3656,6 +3678,12 @@ bool8 PokemonUseItemEffects(struct Pokemon *mon, enum Item item, u8 partyIndex, 
                         u32 currentHP = GetMonData(mon, MON_DATA_HP);
                         u32 maxHP = GetMonData(mon, MON_DATA_MAX_HP);
                         if (isLevelUpItem && !didLevelUp && (effectFlags & (ITEM4_REVIVE >> 2)))
+                        {
+                            itemEffectParam++;
+                            break;
+                        }
+                        // Permadeath: dead Pokémon can't be revived.
+                        if ((effectFlags & (ITEM4_REVIVE >> 2)) && GetMonData(mon, MON_DATA_IS_DEAD))
                         {
                             itemEffectParam++;
                             break;
