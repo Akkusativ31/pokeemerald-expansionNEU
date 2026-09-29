@@ -1,5 +1,10 @@
 RouteTwo_MapScripts::
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, RouteTwo_OnFrame
 	.byte 0
+
+RouteTwo_OnFrame:
+	map_script_2 VAR_TEMP_0, 0, Route_EventScript_EncounterIntro
+	.2byte 0
 
 RouteTwo_EventScript_ReturnNPC::
 	lock

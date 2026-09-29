@@ -1223,7 +1223,12 @@ static u16 GetNightMusicFromTrack(u16 track)
 
 u16 GetLocationMusic(struct WarpData *warp)
 {
-    if (NoMusicInSootopolisWithLegendaries(warp) == TRUE)
+    // The Game Corner is silent until the kidnapping intro has played.
+    if (warp->mapGroup == MAP_GROUP(MAP_MAUVILLE_CITY_GAME_CORNER)
+     && warp->mapNum == MAP_NUM(MAP_MAUVILLE_CITY_GAME_CORNER)
+     && VarGet(VAR_GAME_CORNER_INTRO) == 0)
+        return MUS_NONE;
+    else if (NoMusicInSootopolisWithLegendaries(warp) == TRUE)
         return MUS_NONE;
     else if (ShouldLegendaryMusicPlayAtLocation(warp) == TRUE)
         return MUS_ABNORMAL_WEATHER;

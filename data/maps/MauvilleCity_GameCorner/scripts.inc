@@ -1,5 +1,30 @@
 MauvilleCity_GameCorner_MapScripts::
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, MauvilleCity_GameCorner_OnFrame
 	.byte 0
+
+MauvilleCity_GameCorner_OnFrame:
+	map_script_2 VAR_GAME_CORNER_INTRO, 0, MauvilleCity_GameCorner_EventScript_KidnapIntro
+	.2byte 0
+
+MauvilleCity_GameCorner_EventScript_KidnapIntro::
+	lockall
+	msgbox MauvilleCity_GameCorner_Text_Kidnapped, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_ToolsInTrash, MSGBOX_DEFAULT
+	setvar VAR_GAME_CORNER_INTRO, 1
+	fadedefaultbgm
+	releaseall
+	end
+
+MauvilleCity_GameCorner_Text_Kidnapped:
+	.string "Welcome to the GAME CORNER, {PLAYER}.\p"
+	.string "You have been kidnapped!\p"
+	.string "To escape, you must beat all 8 GYMS\n"
+	.string "and the ELITE FOUR!$"
+
+MauvilleCity_GameCorner_Text_ToolsInTrash:
+	.string "Don't worry, we left you some tools\n"
+	.string "in the trash can in the corner.\p"
+	.string "Talk to the nurse first.$"
 
 	@ Game Corner prices
 	.set TM_DOUBLE_TEAM_COINS, 1500
@@ -780,6 +805,23 @@ MauvilleCity_GameCorner_Text_CantPlayWithNoCoinCase:
 MauvilleCity_GameCorner_EventScript_Nurse::
 	lock
 	faceplayer
+	goto_if_unset FLAG_NURSE_INTRO_DONE, MauvilleCity_GameCorner_EventScript_NurseIntro
+	goto MauvilleCity_GameCorner_EventScript_NurseHeal
+
+MauvilleCity_GameCorner_EventScript_NurseIntro:
+	msgbox MauvilleCity_GameCorner_Text_NurseHello, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseZones, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseLimit, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseEncounterClause, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseDupesClause, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseBosses, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NurseDeath, MSGBOX_DEFAULT
+	setflag FLAG_NURSE_INTRO_DONE
+	msgbox MauvilleCity_GameCorner_Text_NurseGoodLuck, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_NurseHeal:
 	msgbox MauvilleCity_GameCorner_Text_HealPrompt, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_NurseDeclined
 	message MauvilleCity_GameCorner_Text_TakeRest
@@ -819,27 +861,7 @@ MauvilleCity_GameCorner_EventScript_StarterTrashCan::
 	goto_if_set FLAG_SYS_POKEMON_GET, MauvilleCity_GameCorner_EventScript_TrashEmpty
 	msgbox MauvilleCity_GameCorner_Text_LookInTrash, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_DeclinedStarter
-	message MauvilleCity_GameCorner_Text_WhichStarter
-	waitmessage
-	dynmultichoice 0, 0, TRUE, 3, 0, 0, MauvilleCity_GameCorner_Text_Turtwig, MauvilleCity_GameCorner_Text_Chimchar, MauvilleCity_GameCorner_Text_Piplup
-	switch VAR_RESULT
-	case 0, MauvilleCity_GameCorner_GiveTurtwig
-	case 1, MauvilleCity_GameCorner_GiveChimchar
-	case 2, MauvilleCity_GameCorner_GivePiplup
-	case MULTI_B_PRESSED, MauvilleCity_GameCorner_EventScript_DeclinedStarter
-	end
-
-MauvilleCity_GameCorner_GiveTurtwig:
-	givemon SPECIES_TURTWIG, 5, ITEM_NONE
-	goto MauvilleCity_GameCorner_FinishStarter
-
-MauvilleCity_GameCorner_GiveChimchar:
-	givemon SPECIES_CHIMCHAR, 5, ITEM_NONE
-	goto MauvilleCity_GameCorner_FinishStarter
-
-MauvilleCity_GameCorner_GivePiplup:
-	givemon SPECIES_PIPLUP, 5, ITEM_NONE
-	goto MauvilleCity_GameCorner_FinishStarter
+	special ChooseStarterNoBattle
 
 MauvilleCity_GameCorner_FinishStarter:
 	playfanfare MUS_OBTAIN_ITEM
@@ -848,6 +870,19 @@ MauvilleCity_GameCorner_FinishStarter:
 	setflag FLAG_SYS_POKEMON_GET
 	setflag FLAG_SYS_POKEDEX_GET
 	msgbox MauvilleCity_GameCorner_Text_TakeCare, MSGBOX_DEFAULT
+	goto_if_eq VAR_STARTER_MON, 0, MauvilleCity_GameCorner_EventScript_GiveSceptilite
+	goto_if_eq VAR_STARTER_MON, 1, MauvilleCity_GameCorner_EventScript_GiveCharizarditeX
+	giveitem ITEM_FERALIGITE
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_GiveSceptilite:
+	giveitem ITEM_SCEPTILITE
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_GiveCharizarditeX:
+	giveitem ITEM_CHARIZARDITE_X
 	release
 	end
 
@@ -1169,3 +1204,89 @@ MauvilleCity_GameCorner_Text_EncounterUsed:
 MauvilleCity_GameCorner_Text_BossDone:
 	.string "You already defeated this boss.\n"
 	.string "Move on to the next stage!$"
+
+
+@ --- Nurse explanation (first talk) ---
+MauvilleCity_GameCorner_Text_NurseHello:
+	.string "Oh, a new face...\p"
+	.string "Don't look at me like that. I don't\n"
+	.string "know why you're here.\p"
+	.string "I'm just doing my job.$"
+
+MauvilleCity_GameCorner_Text_NurseZones:
+	.string "Here's how it works. Every machine\n"
+	.string "on the left leads to an encounter\l"
+	.string "zone, a route full of wild POKéMON.\p"
+	.string "You can only go to each route once.\n"
+	.string "There is no coming back!$"
+
+MauvilleCity_GameCorner_Text_NurseLimit:
+	.string "You can't catch everything.\n"
+	.string "Only the first few encounters on a\l"
+	.string "route can be caught.\p"
+	.string "On ROUTE ONE that's 5 encounters.\n"
+	.string "Later routes may allow even fewer!$"
+
+MauvilleCity_GameCorner_Text_NurseEncounterClause:
+	.string "That's the ENCOUNTER CLAUSE. Every\n"
+	.string "wild battle uses up one encounter.\p"
+	.string "Every ball is a guaranteed catch.$"
+
+MauvilleCity_GameCorner_Text_NurseDupesClause:
+	.string "And there's the DUPES CLAUSE.\n"
+	.string "If you already caught a POKéMON's\l"
+	.string "family, you can't catch another.\p"
+	.string "Duplicates don't use up an encounter,\n"
+	.string "so don't worry about those.$"
+
+MauvilleCity_GameCorner_Text_NurseBosses:
+	.string "The machines on the right, the black\n"
+	.string "ones, are the boss arenas.\p"
+	.string "Beat a boss to earn a badge. Each\n"
+	.string "badge unlocks the next route and boss.$"
+
+MauvilleCity_GameCorner_Text_NurseDeath:
+	.string "One more thing: a POKéMON that\n"
+	.string "faints is gone for good. I can heal\l"
+	.string "the living, but I can't revive anyone.$"
+
+MauvilleCity_GameCorner_Text_NurseGoodLuck:
+	.string "That's all I'm allowed to say.\n"
+	.string "Come back if your team needs a rest.$"
+
+@ --- Shown every time the player enters an encounter zone ---
+Route_EventScript_EncounterIntro::
+	lockall
+	special BufferRouteEncounterLimit
+	random 3
+	switch VAR_RESULT
+	case 0, Route_EventScript_EncounterIntro1
+	case 1, Route_EventScript_EncounterIntro2
+	msgbox Route_Text_EncounterIntro3, MSGBOX_DEFAULT
+	goto Route_EventScript_EncounterIntroDone
+
+Route_EventScript_EncounterIntro1:
+	msgbox Route_Text_EncounterIntro1, MSGBOX_DEFAULT
+	goto Route_EventScript_EncounterIntroDone
+
+Route_EventScript_EncounterIntro2:
+	msgbox Route_Text_EncounterIntro2, MSGBOX_DEFAULT
+	goto Route_EventScript_EncounterIntroDone
+
+Route_EventScript_EncounterIntroDone:
+	setvar VAR_TEMP_0, 1
+	releaseall
+	end
+
+Route_Text_EncounterIntro1:
+	.string "You have entered an encounter zone.\p"
+	.string "Only the first {STR_VAR_1} encounters here\n"
+	.string "can be caught.$"
+
+Route_Text_EncounterIntro2:
+	.string "Careful! This route only allows\n"
+	.string "{STR_VAR_1} catches, and you can't return.$"
+
+Route_Text_EncounterIntro3:
+	.string "Remember: the first {STR_VAR_1} encounters\n"
+	.string "are your only chance on this route.$"

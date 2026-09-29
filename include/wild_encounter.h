@@ -70,6 +70,7 @@ bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, enum WildPok
 bool8 AreLegendariesInSootopolisPreventingEncounters(void);
 u16 GetCurrentMapWildMonHeaderId(void);
 void RegisterRouteEncounter(void);
+void BufferRouteEncounterLimit(void);
 bool32 IsRouteEncounterCatchBlocked(void);
 void ClearRouteEncounterCatchBlock(void);
 void ResetRouteEncounters(void);

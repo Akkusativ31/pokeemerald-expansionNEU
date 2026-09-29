@@ -341,3 +341,4 @@
 #endif // GUARD_CONSTANTS_VARS_H
 
 #define VAR_LOOP_STAGE    0x4050  // Verwendet einen freien Slot im Custom-Variablen-Bereich
+#define VAR_GAME_CORNER_INTRO VAR_LOOP_STAGE // 0 = the kidnapping intro has not played yet

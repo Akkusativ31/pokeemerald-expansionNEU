@@ -80,6 +80,7 @@ static void CB2_EndMarowakBattle(void);
 static void TryUpdateGymLeaderRematchFromWild(void);
 static void TryUpdateGymLeaderRematchFromTrainer(void);
 static void CB2_GiveStarter(void);
+static void CB2_GiveStarterNoBattle(void);
 static void CB2_StartFirstBattle(void);
 static void CB2_EndFirstBattle(void);
 static void SaveChangesToPlayerParty(void);
@@ -1005,6 +1006,21 @@ void ChooseStarter(void)
 {
     SetMainCallback2(CB2_ChooseStarter);
     gMain.savedCallback = CB2_GiveStarter;
+}
+
+// Shows the original starter selection screen but skips the first battle and the story around it.
+void ChooseStarterNoBattle(void)
+{
+    SetMainCallback2(CB2_ChooseStarter);
+    gMain.savedCallback = CB2_GiveStarterNoBattle;
+}
+
+static void CB2_GiveStarterNoBattle(void)
+{
+    *GetVarPointer(VAR_STARTER_MON) = gSpecialVar_Result;
+    ScriptGiveMon(GetStarterPokemon(gSpecialVar_Result), 5, ITEM_NONE);
+    ResetTasks();
+    SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
 }
 
 static void CB2_GiveStarter(void)

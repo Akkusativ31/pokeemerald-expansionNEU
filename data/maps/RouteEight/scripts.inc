@@ -1,5 +1,10 @@
 RouteEight_MapScripts::
+	map_script MAP_SCRIPT_ON_FRAME_TABLE, RouteEight_OnFrame
 	.byte 0
+
+RouteEight_OnFrame:
+	map_script_2 VAR_TEMP_0, 0, Route_EventScript_EncounterIntro
+	.2byte 0
 
 RouteEight_EventScript_ReturnNPC::
 	lock

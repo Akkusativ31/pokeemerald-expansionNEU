@@ -2459,4 +2459,7 @@
 #define FLAG_ENCOUNTER_7_USED  FLAG_UNUSED_0x026
 #define FLAG_ENCOUNTER_8_USED  FLAG_UNUSED_0x027
 
+// Set once the nurse in the Game Corner has explained the rules.
+#define FLAG_NURSE_INTRO_DONE  FLAG_UNUSED_0x028
+
 #endif // GUARD_CONSTANTS_FLAGS_H

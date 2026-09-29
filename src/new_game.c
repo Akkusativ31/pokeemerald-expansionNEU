@@ -203,6 +203,7 @@ void NewGameInitData(void)
     gSaveBlock1Ptr->registeredItem = ITEM_NONE;
     ClearBag();
     NewGameInitPCItems();
+    AddBagItem(ITEM_MEGA_RING, 1); // Mega Evolution is available from the start.
     ClearPokeblocks();
     ClearDecorationInventories();
     InitEasyChatPhrases();
@@ -219,6 +220,7 @@ void NewGameInitData(void)
 #if IS_FRLG
         StringCopy(gSaveBlock1Ptr->rivalName, rivalName);
 #endif
+    EnableNationalPokedex(); // National Dex is available from the start of a new game.
     ResetMiniGamesRecords();
     InitUnionRoomChatRegisteredTexts();
     InitLilycoveLady();

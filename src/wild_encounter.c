@@ -20,6 +20,7 @@
 #include "roamer.h"
 #include "safari_zone.h"
 #include "script.h"
+#include "string_util.h"
 #include "tv.h"
 #include "wild_encounter.h"
 #include "battle_debug.h"
@@ -451,6 +452,43 @@ u16 GetCurrentMapWildMonHeaderId(void)
 // Encounter clause: only the first B_ROUTE_ENCOUNTER_LIMIT wild encounters on each route can be caught.
 static bool8 sRouteEncounterCatchBlocked;
 
+// Catch limit per encounter room. Rooms that are not listed use B_ROUTE_ENCOUNTER_LIMIT.
+static const struct
+{
+    u8 mapGroup;
+    u8 mapNum;
+    u8 limit;
+} sRouteEncounterLimits[] =
+{
+    {MAP_GROUP(MAP_ROUTE_ONE),   MAP_NUM(MAP_ROUTE_ONE),   5},
+    {MAP_GROUP(MAP_ROUTE_TWO),   MAP_NUM(MAP_ROUTE_TWO),   5},
+    {MAP_GROUP(MAP_ROUTE_THREE), MAP_NUM(MAP_ROUTE_THREE), 5},
+    {MAP_GROUP(MAP_ROUTE_FOUR),  MAP_NUM(MAP_ROUTE_FOUR),  5},
+    {MAP_GROUP(MAP_ROUTE_FIVE),  MAP_NUM(MAP_ROUTE_FIVE),  5},
+    {MAP_GROUP(MAP_ROUTE_SIX),   MAP_NUM(MAP_ROUTE_SIX),   5},
+    {MAP_GROUP(MAP_ROUTE_SEVEN), MAP_NUM(MAP_ROUTE_SEVEN), 5},
+    {MAP_GROUP(MAP_ROUTE_EIGHT), MAP_NUM(MAP_ROUTE_EIGHT), 5},
+};
+
+static u32 GetRouteEncounterLimit(void)
+{
+    u32 i;
+
+    for (i = 0; i < ARRAY_COUNT(sRouteEncounterLimits); i++)
+    {
+        if (sRouteEncounterLimits[i].mapGroup == gSaveBlock1Ptr->location.mapGroup
+         && sRouteEncounterLimits[i].mapNum == gSaveBlock1Ptr->location.mapNum)
+            return sRouteEncounterLimits[i].limit;
+    }
+    return B_ROUTE_ENCOUNTER_LIMIT;
+}
+
+// Script special: puts the current room's catch limit into STR_VAR_1.
+void BufferRouteEncounterLimit(void)
+{
+    ConvertIntToDecimalStringN(gStringVar1, GetRouteEncounterLimit(), STR_CONV_MODE_LEFT_ALIGN, 2);
+}
+
 void RegisterRouteEncounter(void)
 {
     u16 headerId = GetCurrentMapWildMonHeaderId();
@@ -465,7 +503,7 @@ void RegisterRouteEncounter(void)
 
     if (gSaveBlock3Ptr->routeEncounters[headerId] < 255)
         gSaveBlock3Ptr->routeEncounters[headerId]++;
-    if (gSaveBlock3Ptr->routeEncounters[headerId] > B_ROUTE_ENCOUNTER_LIMIT)
+    if (gSaveBlock3Ptr->routeEncounters[headerId] > GetRouteEncounterLimit())
         sRouteEncounterCatchBlocked = TRUE;
 }
 

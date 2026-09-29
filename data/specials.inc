@@ -19,6 +19,7 @@ gSpecials::
 .endif
 	def_special HealPlayerParty
 	def_special ResetRouteEncounters
+	def_special BufferRouteEncounterLimit
 	def_special SetCableClubWarp
 	def_special DoCableClubWarp, waitstate=1
 	def_special ReturnFromLinkRoom, waitstate=1
@@ -176,6 +177,7 @@ gSpecials::
 	def_special StartWallClock, waitstate=1
 	def_special Special_ViewWallClock, waitstate=1
 	def_special ChooseStarter, waitstate=1
+	def_special ChooseStarterNoBattle, waitstate=1
 	def_special StartWallyTutorialBattle, waitstate=1
 	def_special ChangePokemonNickname, waitstate=1
 	def_special ChoosePartyMon, waitstate=1
