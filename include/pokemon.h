@@ -968,6 +968,8 @@ bool32 IsSpeciesEnabled(enum Species species);
 enum PokemonCry GetCryIdBySpecies(enum Species species);
 enum Species GetSpeciesPreEvolution(enum Species species);
 bool32 IsSpeciesFamilyCaught(enum Species species);
+u32 GetLevelToCapTarget(struct Pokemon *mon);
+void SetMonLevelViaExp(struct Pokemon *mon, u32 level);
 void HealPokemon(struct Pokemon *mon);
 void HealBoxPokemon(struct BoxPokemon *boxMon);
 void UpdateDaysPassedSinceFormChange(u16 days);

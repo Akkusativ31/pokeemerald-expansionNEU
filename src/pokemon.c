@@ -6551,6 +6551,41 @@ enum Species GetSpeciesPreEvolution(enum Species species)
     return SPECIES_NONE;
 }
 
+// "Level to Cap": the level a Pokémon should be raised to. That is the level of its next
+// level-up evolution, or the current level cap if it doesn't evolve before that. Returns 0 if it can't level up.
+u32 GetLevelToCapTarget(struct Pokemon *mon)
+{
+    u32 level = GetMonData(mon, MON_DATA_LEVEL);
+    u32 cap = GetCurrentLevelCap();
+    u32 target;
+    struct Pokemon copy;
+    bool32 canStopEvo;
+
+    if (cap > MAX_LEVEL)
+        cap = MAX_LEVEL;
+    if (GetMonData(mon, MON_DATA_IS_EGG) || level >= cap)
+        return 0;
+
+    copy = *mon;
+    for (target = level + 1; target < cap; target++)
+    {
+        SetMonData(&copy, MON_DATA_LEVEL, &target);
+        if (GetEvolutionTargetSpecies(&copy, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, CHECK_EVO) != SPECIES_NONE)
+            return target;
+    }
+    return cap;
+}
+
+// Sets a Pokémon to exactly the given level (by setting its experience) and recalculates its stats.
+void SetMonLevelViaExp(struct Pokemon *mon, u32 level)
+{
+    enum Species species = GetMonData(mon, MON_DATA_SPECIES);
+    u32 exp = gExperienceTables[gSpeciesInfo[species].growthRate][level];
+
+    SetMonData(mon, MON_DATA_EXP, &exp);
+    CalculateMonStats(mon);
+}
+
 // Dupes clause: checks whether any Pokémon in the species' evolution family is registered as caught.
 static bool32 IsEvolutionTreeCaught(enum Species species, u32 depth)
 {

@@ -672,8 +672,11 @@ static void Task_EvolutionScene(u8 taskId)
     {
     case EVOSTATE_FADE_IN:
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0x10, 0, RGB_BLACK);
-        gSprites[sEvoStructPtr->preEvoSpriteId].invisible = FALSE;
-        gTasks[taskId].tState++;
+        // Instant evolution: no sparkles or sprite flashing. Show the evolved Pokémon right away,
+        // then continue with its cry, the "evolved" message and any moves it learns.
+        gSprites[sEvoStructPtr->preEvoSpriteId].invisible = TRUE;
+        gSprites[sEvoStructPtr->postEvoSpriteId].invisible = FALSE;
+        gTasks[taskId].tState = EVOSTATE_EVO_MON_ANIM;
         ShowBg(0);
         ShowBg(1);
         ShowBg(2);

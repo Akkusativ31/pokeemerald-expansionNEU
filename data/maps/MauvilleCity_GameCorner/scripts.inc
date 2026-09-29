@@ -805,6 +805,7 @@ MauvilleCity_GameCorner_Text_CantPlayWithNoCoinCase:
 MauvilleCity_GameCorner_EventScript_Nurse::
 	lock
 	faceplayer
+	goto_if_set FLAG_BADGE01_GET, MauvilleCity_GameCorner_EventScript_NurseHeal
 	goto_if_unset FLAG_NURSE_INTRO_DONE, MauvilleCity_GameCorner_EventScript_NurseIntro
 	goto MauvilleCity_GameCorner_EventScript_NurseHeal
 
@@ -815,6 +816,7 @@ MauvilleCity_GameCorner_EventScript_NurseIntro:
 	msgbox MauvilleCity_GameCorner_Text_NurseEncounterClause, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseDupesClause, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseBosses, MSGBOX_DEFAULT
+	msgbox MauvilleCity_GameCorner_Text_NursePC, MSGBOX_DEFAULT
 	msgbox MauvilleCity_GameCorner_Text_NurseDeath, MSGBOX_DEFAULT
 	setflag FLAG_NURSE_INTRO_DONE
 	msgbox MauvilleCity_GameCorner_Text_NurseGoodLuck, MSGBOX_DEFAULT
@@ -1244,6 +1246,12 @@ MauvilleCity_GameCorner_Text_NurseBosses:
 	.string "ones, are the boss arenas.\p"
 	.string "Beat a boss to earn a badge. Each\n"
 	.string "badge unlocks the next route and boss.$"
+
+MauvilleCity_GameCorner_Text_NursePC:
+	.string "There's a PC in the top left corner.\n"
+	.string "Use it to store POKéMON.\p"
+	.string "Its LEVEL TO CAP option raises a\n"
+	.string "POKéMON straight to the level cap.$"
 
 MauvilleCity_GameCorner_Text_NurseDeath:
 	.string "One more thing: a POKéMON that\n"

@@ -18,6 +18,9 @@
 #include "item_menu.h"
 #include "mail.h"
 #include "main.h"
+#include "battle.h"
+#include "move.h"
+#include "pokedex.h"
 #include "menu.h"
 #include "mon_markings.h"
 #include "naming_screen.h"
@@ -165,6 +168,11 @@ enum {
     MENU_MACHINE,
     MENU_SIMPLE,
     MENU_SELECT,
+    MENU_LEVEL_TO_CAP,
+    MENU_LC_MOVE_1, // The four entries below are the current moves, shown when choosing a move to forget.
+    MENU_LC_MOVE_2,
+    MENU_LC_MOVE_3,
+    MENU_LC_MOVE_4,
 };
 #define MENU_WALLPAPER_SETS_START MENU_SCENERY_1
 #define MENU_WALLPAPERS_START MENU_FOREST
@@ -458,7 +466,7 @@ struct PokemonStorageSystemData
     s8 iconScrollDirection; // Unnecessary duplicate of scrollDirection
     u8 iconScrollState;
     struct WindowTemplate menuWindow;
-    struct StorageMenu menuItems[7];
+    struct StorageMenu menuItems[8];
     u8 menuItemsCount;
     u8 menuWidth;
     u16 menuWindowId;
@@ -520,6 +528,18 @@ struct PokemonStorageSystemData
         struct BoxPokemon *box;
     } summaryMon;
     u8 messageText[40];
+    // "Level to Cap" state
+    u8 lcMessageText[96];
+    u8 lcWindowId;
+    bool8 lcWindowOpen;
+    u8 lcMoveText[MAX_MON_MOVES][MOVE_NAME_LENGTH + 1];
+    struct Pokemon levelCapMon;
+    u8 lcCurLevel;
+    u8 lcFinalLevel;
+    bool8 lcFirstMove;
+    bool8 lcEvoMoves;
+    bool8 lcSpeciesChanged;
+    enum Move lcMove;
     u8 boxTitleText[40];
     u8 releaseMonName[POKEMON_NAME_LENGTH + 1];
     u8 itemName[20];
@@ -583,6 +603,7 @@ static void Task_TakeItemForMoving(u8);
 static void Task_ShowMarkMenu(u8);
 static void Task_ShowMonSummary(u8);
 static void Task_ReleaseMon(u8);
+static void Task_LevelToCap(u8);
 static void Task_ReshowPokeStorage(u8);
 static void Task_PokeStorageMain(u8);
 static void Task_JumpBox(u8);
@@ -614,6 +635,7 @@ static void InitMenu(void);
 static void SetMenuText(u8);
 static s8 GetMenuItemTextId(u8);
 static void AddMenu(void);
+static void AddMenuAt(u8 bottomRow);
 static bool8 IsMenuLoading(void);
 static s16 HandleMenuInput(void);
 static void RemoveMenu(void);
@@ -2657,6 +2679,10 @@ static void Task_OnSelectedMon(u8 taskId)
             PlaySE(SE_SELECT);
             SetPokeStorageTask(Task_ShowMonSummary);
             break;
+        case MENU_LEVEL_TO_CAP:
+            PlaySE(SE_SELECT);
+            SetPokeStorageTask(Task_LevelToCap);
+            break;
         case MENU_MARK:
             PlaySE(SE_SELECT);
             SetPokeStorageTask(Task_ShowMarkMenu);
@@ -3035,6 +3061,296 @@ static void Task_ReleaseMon(u8 taskId)
         break;
     }
 }
+
+//------------------------------------------------------------------------------
+//  "Level to Cap" from the PC
+//
+//  Raises the selected Pokémon to the level of its next level-up evolution (or the
+//  level cap), lists every move it learns one after another, then evolves it.
+//  It all happens inside the PC screen, on a working copy that is written back at the end.
+//------------------------------------------------------------------------------
+
+enum {
+    LC_START,
+    LC_WAIT_GREW,
+    LC_LEARN,
+    LC_FORGET_YES_NO,
+    LC_PICK_MOVE,
+    LC_WAIT_MSG,
+    LC_EVOLVE,
+    LC_WAIT_EVOLVED,
+    LC_FINISH,
+    LC_WAIT_EXIT,
+};
+
+static const u8 sText_LcNoLevelUp[]     = _("{STR_VAR_1} can't gain another\nlevel right now.");
+static const u8 sText_LcGrew[]          = _("{STR_VAR_1} grew to\nLv. {STR_VAR_2}!");
+static const u8 sText_LcLearned[]       = _("{STR_VAR_1} learned\n{STR_VAR_2}!");
+static const u8 sText_LcForgetPrompt[]  = _("Make {STR_VAR_1} forget a move\nto learn {STR_VAR_2}?");
+static const u8 sText_LcPickMove[]      = _("Forget which move to\nlearn {STR_VAR_2}?");
+static const u8 sText_LcForgotLearned[] = _("Forgot {STR_VAR_3}, and\nlearned {STR_VAR_2}!");
+static const u8 sText_LcNotLearned[]    = _("{STR_VAR_1} did not learn\n{STR_VAR_2}.");
+static const u8 sText_LcEvolved[]       = _("{STR_VAR_1} evolved into\n{STR_VAR_2}!");
+
+// The normal PC message window only fits one short line, so the Level to Cap messages use a bigger one.
+static const struct WindowTemplate sWindowTemplate_LevelCapMessage =
+{
+    .bg = 0,
+    .tilemapLeft = 10,
+    .tilemapTop = 15,
+    .width = 19,
+    .height = 4,
+    .paletteNum = 15,
+    .baseBlock = 0x100,
+};
+
+static void PrintLevelCapMessage(const u8 *text)
+{
+    if (!sStorage->lcWindowOpen)
+    {
+        sStorage->lcWindowId = AddWindow(&sWindowTemplate_LevelCapMessage);
+        sStorage->lcWindowOpen = TRUE;
+    }
+    StringExpandPlaceholders(sStorage->lcMessageText, text);
+    FillWindowPixelBuffer(sStorage->lcWindowId, PIXEL_FILL(1));
+    AddTextPrinterParameterized(sStorage->lcWindowId, FONT_NARROW, sStorage->lcMessageText, 0, 1, TEXT_SKIP_DRAW, NULL);
+    DrawTextBorderOuter(sStorage->lcWindowId, 2, 14);
+    PutWindowTilemap(sStorage->lcWindowId);
+    CopyWindowToVram(sStorage->lcWindowId, COPYWIN_GFX);
+    ScheduleBgCopyTilemapToVram(0);
+}
+
+static void CloseLevelCapMessage(void)
+{
+    if (sStorage->lcWindowOpen)
+    {
+        ClearStdWindowAndFrameToTransparent(sStorage->lcWindowId, TRUE);
+        RemoveWindow(sStorage->lcWindowId);
+        sStorage->lcWindowOpen = FALSE;
+    }
+}
+
+static void Task_LevelToCap(u8 taskId)
+{
+    struct Pokemon *mon = &sStorage->levelCapMon;
+
+    switch (sStorage->state)
+    {
+    case LC_START:
+    {
+        u32 target;
+
+        if (sInPartyMenu)
+            *mon = gParties[B_TRAINER_PLAYER][sCursorPosition];
+        else
+            BoxMonToMon(GetCursorBoxMon(), mon);
+
+        target = GetLevelToCapTarget(mon);
+        GetMonNickname(mon, gStringVar1);
+        sStorage->lcSpeciesChanged = FALSE;
+        sStorage->lcWindowOpen = FALSE;
+        if (target == 0)
+        {
+            PlaySE(SE_FAILURE);
+            PrintLevelCapMessage(sText_LcNoLevelUp);
+            sStorage->state = LC_WAIT_EXIT;
+            break;
+        }
+
+        sStorage->lcCurLevel = GetMonData(mon, MON_DATA_LEVEL) + 1;
+        SetMonLevelViaExp(mon, target);
+        sStorage->lcFinalLevel = GetMonData(mon, MON_DATA_LEVEL);
+        sStorage->lcFirstMove = TRUE;
+        sStorage->lcEvoMoves = FALSE;
+        ConvertIntToDecimalStringN(gStringVar2, sStorage->lcFinalLevel, STR_CONV_MODE_LEFT_ALIGN, 3);
+        PlayFanfare(MUS_LEVEL_UP);
+        PrintLevelCapMessage(sText_LcGrew);
+        sStorage->state = LC_WAIT_GREW;
+        break;
+    }
+    case LC_WAIT_GREW:
+    case LC_WAIT_MSG:
+    case LC_WAIT_EVOLVED:
+        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        {
+            if (sStorage->state == LC_WAIT_EVOLVED)
+            {
+                sStorage->lcEvoMoves = TRUE;
+                sStorage->lcFirstMove = TRUE;
+            }
+            sStorage->state = LC_LEARN;
+        }
+        break;
+    case LC_LEARN:
+    {
+        u32 result;
+
+        while (TRUE)
+        {
+            if (sStorage->lcEvoMoves)
+            {
+                result = MonTryLearningNewMoveEvolution(mon, sStorage->lcFirstMove);
+                sStorage->lcFirstMove = FALSE;
+                if (result == MOVE_NONE)
+                {
+                    sStorage->state = LC_FINISH;
+                    return;
+                }
+            }
+            else
+            {
+                if (sStorage->lcCurLevel > sStorage->lcFinalLevel)
+                {
+                    SetMonData(mon, MON_DATA_LEVEL, &sStorage->lcFinalLevel);
+                    sStorage->state = LC_EVOLVE;
+                    return;
+                }
+                // Learn the moves of each level that was skipped, one level at a time.
+                SetMonData(mon, MON_DATA_LEVEL, &sStorage->lcCurLevel);
+                result = MonTryLearningNewMove(mon, sStorage->lcFirstMove);
+                sStorage->lcFirstMove = FALSE;
+                if (result == MOVE_NONE)
+                {
+                    sStorage->lcCurLevel++;
+                    sStorage->lcFirstMove = TRUE;
+                    continue;
+                }
+            }
+
+            if (result == MON_ALREADY_KNOWS_MOVE)
+                continue;
+
+            GetMonNickname(mon, gStringVar1);
+            if (result == MON_HAS_MAX_MOVES)
+            {
+                sStorage->lcMove = gMoveToLearn;
+                StringCopy(gStringVar2, GetMoveName(sStorage->lcMove));
+                PrintLevelCapMessage(sText_LcForgetPrompt);
+                ShowYesNoWindow(0);
+                sStorage->state = LC_FORGET_YES_NO;
+            }
+            else
+            {
+                StringCopy(gStringVar2, GetMoveName(result));
+                PlaySE(SE_EXP_MAX);
+                PrintLevelCapMessage(sText_LcLearned);
+                sStorage->state = LC_WAIT_MSG;
+            }
+            return;
+        }
+        break;
+    }
+    case LC_FORGET_YES_NO:
+        switch (Menu_ProcessInputNoWrapClearOnChoose())
+        {
+        case 0: // Yes: pick the move to forget
+        {
+            u32 i;
+
+            for (i = 0; i < MAX_MON_MOVES; i++)
+                StringCopy(sStorage->lcMoveText[i], GetMoveName(GetMonData(mon, MON_DATA_MOVE1 + i)));
+            InitMenu();
+            SetMenuText(MENU_LC_MOVE_1);
+            SetMenuText(MENU_LC_MOVE_2);
+            SetMenuText(MENU_LC_MOVE_3);
+            SetMenuText(MENU_LC_MOVE_4);
+            SetMenuText(MENU_CANCEL);
+            AddMenuAt(13); // sits above the message window instead of running into it
+            PrintLevelCapMessage(sText_LcPickMove);
+            sStorage->state = LC_PICK_MOVE;
+            break;
+        }
+        case MENU_B_PRESSED:
+        case 1: // No: keep the old moves
+            StringCopy(gStringVar2, GetMoveName(sStorage->lcMove));
+            PrintLevelCapMessage(sText_LcNotLearned);
+            sStorage->state = LC_WAIT_MSG;
+            break;
+        }
+        break;
+    case LC_PICK_MOVE:
+    {
+        s16 input = HandleMenuInput();
+
+        if (input == MENU_NOTHING_CHOSEN)
+            break;
+
+        StringCopy(gStringVar2, GetMoveName(sStorage->lcMove));
+        if (input >= MENU_LC_MOVE_1 && input <= MENU_LC_MOVE_4)
+        {
+            u32 slot = input - MENU_LC_MOVE_1;
+
+            StringCopy(gStringVar3, sStorage->lcMoveText[slot]);
+            RemoveMonPPBonus(mon, slot);
+            SetMonMoveSlot(mon, sStorage->lcMove, slot);
+            PlaySE(SE_EXP_MAX);
+            PrintLevelCapMessage(sText_LcForgotLearned);
+        }
+        else
+        {
+            PrintLevelCapMessage(sText_LcNotLearned);
+        }
+        sStorage->state = LC_WAIT_MSG;
+        break;
+    }
+    case LC_EVOLVE:
+    {
+        enum Species targetSpecies;
+        enum Species preEvoSpecies = GetMonData(mon, MON_DATA_SPECIES);
+        bool32 canStopEvo = TRUE;
+
+        targetSpecies = GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, CHECK_EVO);
+        if (targetSpecies == SPECIES_NONE)
+        {
+            sStorage->state = LC_FINISH;
+            break;
+        }
+
+        GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, ITEM_NONE, NULL, &canStopEvo, DO_EVO);
+        GetMonNickname(mon, gStringVar1);
+        SetMonData(mon, MON_DATA_SPECIES, &targetSpecies);
+        CalculateMonStats(mon);
+        EvolutionRenameMon(mon, preEvoSpecies, targetSpecies);
+        GetSetPokedexFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_SET_SEEN);
+        GetSetPokedexFlag(SpeciesToNationalPokedexNum(targetSpecies), FLAG_SET_CAUGHT);
+        StringCopy(gStringVar2, GetSpeciesName(targetSpecies));
+        sStorage->lcSpeciesChanged = TRUE;
+        PlayFanfare(MUS_EVOLVED);
+        PrintLevelCapMessage(sText_LcEvolved);
+        sStorage->state = LC_WAIT_EVOLVED;
+        break;
+    }
+    case LC_FINISH:
+        // Write the working copy back and refresh what the PC shows.
+        if (sInPartyMenu)
+            gParties[B_TRAINER_PLAYER][sCursorPosition] = *mon;
+        else
+            *GetCursorBoxMon() = mon->box;
+        CloseLevelCapMessage();
+        ClearBottomWindow();
+        TryRefreshDisplayMon();
+        if (sStorage->lcSpeciesChanged)
+        {
+            sRefreshDisplayMonGfx = TRUE;
+            UpdateSpeciesSpritePSS(GetCursorBoxMon());
+        }
+        else
+        {
+            RefreshDisplayMonData();
+        }
+        SetPokeStorageTask(Task_PokeStorageMain);
+        break;
+    case LC_WAIT_EXIT:
+        if (JOY_NEW(A_BUTTON | B_BUTTON))
+        {
+            CloseLevelCapMessage();
+            ClearBottomWindow();
+            SetPokeStorageTask(Task_PokeStorageMain);
+        }
+        break;
+    }
+}
+
 
 static void Task_ShowMarkMenu(u8 taskId)
 {
@@ -7801,6 +8117,8 @@ static bool8 SetMenuTexts_Mon(void)
     }
 
     SetMenuText(MENU_SUMMARY);
+    if (sStorage->boxOption != OPTION_SELECT_MON && !sStorage->displayMonIsEgg)
+        SetMenuText(MENU_LEVEL_TO_CAP);
     if (sStorage->boxOption == OPTION_MOVE_MONS)
     {
         if (sCursorArea == CURSOR_AREA_IN_BOX)
@@ -8107,6 +8425,7 @@ static const u8 *const sMenuTexts[] =
     [MENU_MACHINE]    = COMPOUND_STRING("MACHINE"),
     [MENU_SIMPLE]     = COMPOUND_STRING("SIMPLE"),
     [MENU_SELECT]     = COMPOUND_STRING("SELECT"),
+    [MENU_LEVEL_TO_CAP] = COMPOUND_STRING("LEVEL TO CAP"),
 };
 
 static void SetMenuText(u8 textId)
@@ -8116,7 +8435,10 @@ static void SetMenuText(u8 textId)
         u8 len;
         struct StorageMenu *menu = &sStorage->menuItems[sStorage->menuItemsCount];
 
-        menu->text = sMenuTexts[textId];
+        if (textId >= MENU_LC_MOVE_1 && textId <= MENU_LC_MOVE_4)
+            menu->text = sStorage->lcMoveText[textId - MENU_LC_MOVE_1];
+        else
+            menu->text = sMenuTexts[textId];
         menu->textId = textId;
         len = StringLength(menu->text);
         if (len > sStorage->menuWidth)
@@ -8136,10 +8458,15 @@ static s8 GetMenuItemTextId(u8 menuIdx)
 
 static void AddMenu(void)
 {
+    AddMenuAt(15);
+}
+
+static void AddMenuAt(u8 bottomRow)
+{
     sStorage->menuWindow.width = sStorage->menuWidth + 2;
     sStorage->menuWindow.height = 2 * sStorage->menuItemsCount;
     sStorage->menuWindow.tilemapLeft = 29 - sStorage->menuWindow.width;
-    sStorage->menuWindow.tilemapTop = 15 - sStorage->menuWindow.height;
+    sStorage->menuWindow.tilemapTop = bottomRow - sStorage->menuWindow.height;
     sStorage->menuWindowId = AddWindow(&sStorage->menuWindow);
     ClearWindowTilemap(sStorage->menuWindowId);
     DrawStdFrameWithCustomTileAndPalette(sStorage->menuWindowId, FALSE, 11, 14);
