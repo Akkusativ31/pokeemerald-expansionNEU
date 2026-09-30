@@ -18,6 +18,10 @@ The repo lives in WSL Ubuntu at `~/decomps/pokeemerald-expansion`.
   (or a script file) and check that each `.string "..."` line ends with `\n"` on the same line.
 - Editing files over the `\\wsl.localhost\...` path sometimes fails once with `EPERM`; just retry the edit.
 - `data/maps/RouteOne/scripts.pory` mirrors `scripts.inc` (raw assembly). Keep both in sync when editing Route One.
+- Git: `core.fileMode` is false in this repo (editing via the `\\wsl.localhost` path flips the executable bit on every file). Commits use
+  the repo-local identity Akkusativ31 <71349464+Akkusativ31@users.noreply.github.com>. `origin` = the user's fork (pokeemerald-expansionNEU),
+  `upstream` = rh-hideout. Write commit messages to a file and use `git commit -F file` (quotes/apostrophes break `bash -lc` heredocs).
+  Upstream fixes are merged deliberately (last: 13 commits on 2026-09-30, one conflict in party_menu.c's move-learning check).
 - Nothing here has been play-tested by Claude (no emulator). The user tests in mGBA and reports back.
 
 ## The hub (Mauville Game Corner) - `data/maps/MauvilleCity_GameCorner/`
