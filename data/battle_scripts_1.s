@@ -3119,7 +3119,6 @@ BattleScript_ForgotAndLearnedNewMove::
 	printstring STRINGID_ANDELLIPSIS
 BattleScript_LearnedNewMove::
 	buffermovetolearn
-	fanfare MUS_LEVEL_UP
 	printstring STRINGID_PKMNLEARNEDMOVE
 	waitmessage B_WAIT_TIME_LONG
 	updatechoicemoveonlvlup

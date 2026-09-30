@@ -5627,7 +5627,7 @@ static void Task_DoLearnedMoveFanfareAfterText(u8 taskId)
 {
     if (IsPartyMenuTextPrinterActive() != TRUE)
     {
-        PlayFanfare(MUS_LEVEL_UP);
+        // No jingle after learning a move (it paused the game); the level-up jingle is unchanged.
         gTasks[taskId].func = Task_LearnNextMoveOrClosePartyMenu;
     }
 }

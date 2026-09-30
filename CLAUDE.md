@@ -73,6 +73,8 @@ Enemies can **never Terastallize** (`ShouldTrainerBattlerUseGimmick` in `src/bat
   (`GetAdjustedInitialDirection`), Scott says "Hmph... I'm disappointed...", then `DoSoftReset`. The save is not erased.
 - **Starter**: trash can uses `special ChooseStarterNoBattle` (original bag screen, no battle). Treecko / Charmander / Totodile, plus the
   Mega Stone of the final evolution (Sceptilite / Charizardite X / Feraligite). Mega Ring, National Dex given at new game (`src/new_game.c`).
+- No jingle after learning a move (it paused the game): removed in the party menu (`Task_DoLearnedMoveFanfareAfterText`),
+  the battle script (`BattleScript_LearnedNewMove`) and both evolution scenes. The "grew to Lv. X" jingle is kept.
 - Other settings already on: instant text, no bag in battle, shiny odds 1/512, no EV gain, `B_SHOW_TYPES` always, effectiveness always,
   low-HP beep 3 times, Pokedex button removed from the start menu.
 
