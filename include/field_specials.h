@@ -41,4 +41,6 @@ bool32 CheckPartyHasSpecies(enum Species);
 bool8 CutMoveRuinValleyCheck(void);
 void CutMoveOpenDottedHoleDoor(void);
 
+void TryStartSlotArrivalEffect(void);
+
 #endif // GUARD_FIELD_SPECIALS_H

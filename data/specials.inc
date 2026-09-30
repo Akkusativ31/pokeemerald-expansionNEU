@@ -333,6 +333,7 @@ gSpecials::
 	def_special IsPokerusInParty
 	def_special SetSootopolisGymCrackedIceMetatiles
 	def_special ShakeCamera
+	def_special DoSlotGlitchEffect
 	def_special StartGroudonKyogreBattle
 	def_special BattleSetup_StartLegendaryBattle, waitstate=1
 	def_special StartRegiBattle, waitstate=1

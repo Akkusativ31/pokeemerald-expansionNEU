@@ -8,10 +8,11 @@ RouteFour_OnFrame:
 
 RouteFour_EventScript_ReturnNPC::
 	lock
-	faceplayer
 	msgbox RouteFour_Text_ReturnPrompt, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, RouteFour_EventScript_DeclinedReturn
-	msgbox RouteFour_Text_Returning, MSGBOX_DEFAULT
+	closemessage
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_MAUVILLE_CITY_GAME_CORNER, 11, 6
 	waitstate
 	release
@@ -23,12 +24,8 @@ RouteFour_EventScript_DeclinedReturn:
 	end
 
 RouteFour_Text_ReturnPrompt:
-	.string "Finished with your encounter?\n"
-	.string "Would you like to return to the Hub?$"
-
-RouteFour_Text_Returning:
-	.string "Alright, teleporting back now!$"
+	.string "The triangle hums quietly...\p"
+	.string "Cash out and leave this spin?$"
 
 RouteFour_Text_DeclinedReturn:
-	.string "Good luck with your catch! Let me\n"
-	.string "know when you are ready to return.$"
+	.string "The hum fades.$"

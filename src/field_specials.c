@@ -12,6 +12,7 @@
 #include "event_object_movement.h"
 #include "fieldmap.h"
 #include "field_camera.h"
+#include "gpu_regs.h"
 #include "field_effect.h"
 #include "field_message_box.h"
 #include "field_player_avatar.h"
@@ -5766,3 +5767,123 @@ bool8 CheckAddCoins(void)
     else
         return TRUE;
 }
+
+// "Entering the slot" effect: the screen pixelates more and more, like the player is being pulled into the machine,
+// then fades to black. Used by the Game Corner encounter slots before the warp. Script usage: special DoSlotGlitchEffect / waitstate.
+// It leaves the screen black; the following warpsilent loads the new map (which resets the background settings).
+#define PIXEL_FRAMES 36    // frames for the pixelation to reach its maximum
+#define PIXEL_FADE_DELAY 1 // speed of the fade to black at the end
+
+#define tTimer data[0]
+#define tState data[1]
+
+static void Task_SlotGlitchEffect(u8 taskId);
+static void Task_SlotArrivalEffect(u8 taskId);
+
+static EWRAM_DATA bool8 sSlotArrivalPending = FALSE;
+
+static void SetSlotMosaic(bool32 on)
+{
+    u32 i;
+
+    for (i = 1; i < 4; i++) // map layers only; BG0 holds the text windows
+    {
+        if (on)
+            SetGpuRegBits(REG_OFFSET_BG0CNT + i * 2, BGCNT_MOSAIC);
+        else
+            ClearGpuRegBits(REG_OFFSET_BG0CNT + i * 2, BGCNT_MOSAIC);
+    }
+    for (i = 0; i < MAX_SPRITES; i++)
+    {
+        if (gSprites[i].inUse)
+            gSprites[i].oam.mosaic = on;
+    }
+}
+
+void DoSlotGlitchEffect(void)
+{
+    u8 taskId = CreateTask(Task_SlotGlitchEffect, 9);
+    gTasks[taskId].tTimer = 0;
+    gTasks[taskId].tState = 0;
+    SetGpuReg(REG_OFFSET_MOSAIC, 0);
+    SetSlotMosaic(TRUE);
+    PlaySE(SE_PC_ON);
+}
+
+static void Task_SlotGlitchEffect(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    switch (tState)
+    {
+    case 0: // pixelate: block size grows from 1 to 16 pixels
+    {
+        u32 size;
+
+        tTimer++;
+        size = (tTimer * 15) / PIXEL_FRAMES;
+        if (size > 15)
+            size = 15;
+        // BG mosaic in bits 0-7, sprite mosaic in bits 8-15
+        SetGpuReg(REG_OFFSET_MOSAIC, size | (size << 4) | (size << 8) | (size << 12));
+        if (tTimer == PIXEL_FRAMES / 2)
+            PlaySE(SE_M_THUNDER_WAVE);
+        if (tTimer >= PIXEL_FRAMES)
+        {
+            PlaySE(SE_WARP_OUT);
+            BeginNormalPaletteFade(PALETTES_ALL, PIXEL_FADE_DELAY, 0, 16, RGB_BLACK);
+            tState++;
+        }
+        break;
+    }
+    case 1: // wait for the fade, then turn the pixelation off behind the black screen
+        if (!gPaletteFade.active)
+        {
+            SetGpuReg(REG_OFFSET_MOSAIC, 0);
+            SetSlotMosaic(FALSE);
+            sSlotArrivalPending = TRUE; // the next map starts pixelated and sharpens
+            DestroyTask(taskId);
+            ScriptContext_Enable();
+        }
+        break;
+    }
+}
+
+// Arrival after a slot warp: the reverse effect. Called from the warp-exit field callback while the screen is still black,
+// so the new map starts fully pixelated and sharpens while it fades in.
+void TryStartSlotArrivalEffect(void)
+{
+    u8 taskId;
+
+    if (!sSlotArrivalPending)
+        return;
+    sSlotArrivalPending = FALSE;
+    taskId = CreateTask(Task_SlotArrivalEffect, 9);
+    gTasks[taskId].tTimer = PIXEL_FRAMES;
+    SetGpuReg(REG_OFFSET_MOSAIC, 0xFFFF);
+    SetSlotMosaic(TRUE);
+    PlaySE(SE_WARP_IN);
+}
+
+static void Task_SlotArrivalEffect(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u32 size;
+
+    tTimer--;
+    if (tTimer <= 0)
+    {
+        SetGpuReg(REG_OFFSET_MOSAIC, 0);
+        SetSlotMosaic(FALSE);
+        DestroyTask(taskId);
+        return;
+    }
+    size = (tTimer * 15) / PIXEL_FRAMES;
+    SetGpuReg(REG_OFFSET_MOSAIC, size | (size << 4) | (size << 8) | (size << 12));
+    SetSlotMosaic(TRUE); // also catches sprites that appeared since the last frame
+}
+
+#undef tTimer
+#undef tState
+#undef PIXEL_FRAMES
+#undef PIXEL_FADE_DELAY

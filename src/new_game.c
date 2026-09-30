@@ -204,6 +204,7 @@ void NewGameInitData(void)
     ClearBag();
     NewGameInitPCItems();
     AddBagItem(ITEM_MEGA_RING, 1); // Mega Evolution is available from the start.
+    AddBagItem(ITEM_SUPER_ROD, 1); // Fishing is available from the start.
     ClearPokeblocks();
     ClearDecorationInventories();
     InitEasyChatPhrases();

@@ -10,6 +10,7 @@
 #include "event_scripts.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
+#include "field_specials.h"
 #include "field_special_scene.h"
 #include "field_weather.h"
 #include "follower_npc.h"
@@ -298,6 +299,7 @@ void FieldCB_DefaultWarpExit(void)
 {
     Overworld_PlaySpecialMapMusic();
     WarpFadeInScreen();
+    TryStartSlotArrivalEffect(); // only does something right after a Game Corner slot warp
     SetUpWarpExitTask();
     FollowerNPC_WarpSetEnd();
     LockPlayerFieldControls();

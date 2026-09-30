@@ -18,8 +18,8 @@ MauvilleCity_GameCorner_EventScript_KidnapIntro::
 MauvilleCity_GameCorner_Text_Kidnapped:
 	.string "Welcome to the GAME CORNER, {PLAYER}.\p"
 	.string "You have been kidnapped!\p"
-	.string "To escape, you must beat all 8 GYMS\n"
-	.string "and the ELITE FOUR!$"
+	.string "To escape, you must beat\n"
+	.string "all 8 GYM LEADERS!$"
 
 MauvilleCity_GameCorner_Text_ToolsInTrash:
 	.string "Don't worry, we left you some tools\n"
@@ -938,6 +938,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot1::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter1, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_1_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_ONE, 15, 6
 	waitstate
 	release
@@ -954,8 +956,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot1::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter1:
-	.string "Enter the encounter zone of\n"
-	.string "stage 1? You can only visit it once!$"
+	.string "Spin slot 1?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss1:
 	.string "Challenge ROXANNE in the\n"
@@ -968,6 +970,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot2::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter2, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_2_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_TWO, 15, 6
 	waitstate
 	release
@@ -985,8 +989,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot2::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter2:
-	.string "Enter the encounter zone of\n"
-	.string "stage 2? You can only visit it once!$"
+	.string "Spin slot 2?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss2:
 	.string "Challenge BRAWLY in the\n"
@@ -999,6 +1003,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot3::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter3, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_3_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_THREE, 15, 6
 	waitstate
 	release
@@ -1016,8 +1022,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot3::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter3:
-	.string "Enter the encounter zone of\n"
-	.string "stage 3? You can only visit it once!$"
+	.string "Spin slot 3?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss3:
 	.string "Challenge WATTSON in the\n"
@@ -1030,6 +1036,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot4::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter4, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_4_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_FOUR, 15, 6
 	waitstate
 	release
@@ -1047,8 +1055,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot4::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter4:
-	.string "Enter the encounter zone of\n"
-	.string "stage 4? You can only visit it once!$"
+	.string "Spin slot 4?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss4:
 	.string "Challenge FLANNERY in the\n"
@@ -1061,6 +1069,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot5::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter5, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_5_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_FIVE, 15, 6
 	waitstate
 	release
@@ -1078,8 +1088,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot5::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter5:
-	.string "Enter the encounter zone of\n"
-	.string "stage 5? You can only visit it once!$"
+	.string "Spin slot 5?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss5:
 	.string "Challenge NORMAN in the\n"
@@ -1092,6 +1102,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot6::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter6, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_6_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_SIX, 15, 6
 	waitstate
 	release
@@ -1109,8 +1121,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot6::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter6:
-	.string "Enter the encounter zone of\n"
-	.string "stage 6? You can only visit it once!$"
+	.string "Spin slot 6?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss6:
 	.string "Challenge WINONA in the\n"
@@ -1123,6 +1135,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot7::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter7, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_7_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_SEVEN, 15, 6
 	waitstate
 	release
@@ -1140,8 +1154,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot7::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter7:
-	.string "Enter the encounter zone of\n"
-	.string "stage 7? You can only visit it once!$"
+	.string "Spin slot 7?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss7:
 	.string "Challenge WALLACE in the\n"
@@ -1154,6 +1168,8 @@ MauvilleCity_GameCorner_EventScript_EncounterSlot8::
 	msgbox MauvilleCity_GameCorner_Text_ConfirmEncounter8, MSGBOX_YESNO
 	goto_if_eq VAR_RESULT, NO, MauvilleCity_GameCorner_EventScript_SlotCancel
 	setflag FLAG_ENCOUNTER_8_USED
+	special DoSlotGlitchEffect
+	waitstate
 	warpsilent MAP_ROUTE_EIGHT, 15, 6
 	waitstate
 	release
@@ -1171,8 +1187,8 @@ MauvilleCity_GameCorner_EventScript_BossSlot8::
 	end
 
 MauvilleCity_GameCorner_Text_ConfirmEncounter8:
-	.string "Enter the encounter zone of\n"
-	.string "stage 8? You can only visit it once!$"
+	.string "Spin slot 8?\n"
+	.string "You can only spin it once!$"
 
 MauvilleCity_GameCorner_Text_ConfirmBoss8:
 	.string "Challenge WALLY in the\n"
@@ -1202,8 +1218,8 @@ MauvilleCity_GameCorner_Text_SlotLocked:
 	.string "Earn the previous badge first.$"
 
 MauvilleCity_GameCorner_Text_EncounterUsed:
-	.string "You already used this encounter\n"
-	.string "zone.$"
+	.string "This slot has already\n"
+	.string "been spun.$"
 
 MauvilleCity_GameCorner_Text_BossDone:
 	.string "You already defeated this boss.\n"
